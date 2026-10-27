@@ -1820,3 +1820,41 @@ tr:last-child td {
     margin-top: -6px;
   }
 }
+
+/* Dedicated trading workspace: dense analytical canvas, not logistics cards. */
+:root{color-scheme:dark;--ink:#dde7ef;--muted:#8c9eae;--line:#31404d;--canvas:#101820;--paper:#17232d;--orange:#e7b96a;--orange-soft:#323023;--green:#83c8ad;--red:#f18f8f}
+body{background:#101820;color:#dde7ef;font-family:Arial,sans-serif}
+.mastbar{min-height:60px;background:#0b1117;border-bottom:1px solid #31404d}
+.source-bar,.context-bar{background:#18242e;color:#b4c3cf;border-color:#31404d}
+.workspace,main{background:transparent}
+.card,.metrics,.decision-strip,.demo-banner{background:#17232d;color:#dbe6ed;border-color:#31404d;border-radius:0;box-shadow:none}
+.card-header h2,h1,h2,h3,.metric strong{color:#e3ecf2}
+.metric small,.eyebrow,.muted,.card p{color:#a2b2c0}
+.investigation{background:#202b32;border:1px solid #736342;border-left:4px solid #e7b96a;color:#dde7ef}
+.investigation .button,.button.primary{background:#e7b96a;color:#17212a;border-color:#e7b96a}
+.overview-grid{grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr)}
+.cash-card{grid-column:1;grid-row:1}.operations-card{grid-column:1 / -1;grid-row:2}.exposure-card{grid-column:2;grid-row:1}
+.risk-workbench{margin:22px 0 28px;border-top:1px solid #46515b;padding-top:20px}
+.risk-workbench>header{display:flex;align-items:baseline;gap:22px;flex-wrap:wrap;margin-bottom:18px}
+.risk-workbench h2{font-size:23px;margin:0}.risk-workbench header p{margin:0;color:#95a7b6}
+#risk-diagnostics{display:grid;grid-template-columns:1.25fr 1fr;gap:32px}.risk-workbench h3{font-size:15px;margin:0}.risk-workbench p{color:#95a7b6;font-size:11px}
+.stress-cells{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:#3b4a56;border:1px solid #3b4a56;margin:25px 0}
+.stress-cell{background:#192d2c;border:0;padding:22px 8px;text-align:left;color:#b2e3cd;min-width:0}.stress-cell.breach{background:#382a2d;color:#ffaaaa}.stress-cell:hover{outline:2px solid #e7b96a;outline-offset:-2px}.stress-cell small,.stress-cell span{display:block;font-size:10px}.stress-cell strong{display:block;font-size:19px;margin:12px 0}
+.risk-ranking{border-left:1px solid #354451;padding-left:25px}.risk-ranking button{display:flex;width:100%;align-items:center;gap:14px;background:transparent;border:0;border-bottom:1px solid #31404d;text-align:left;padding:10px 0;font-size:11px;color:#dce6ee}.risk-ranking button:hover{background:#21313c}.risk-ranking small{display:block;color:#95a7b6;font-size:10px}.rank{color:#e7b96a}.risk-name{flex:1}.risk-name i{display:block;height:3px;background:#e7b96a;margin-top:7px}
+table,thead,tbody,tr,td,th{border-color:#34434f!important}th{background:#202e39!important;color:#a5b7c6!important}td{color:#d9e4ec}tr{background:transparent!important}tr:hover{background:#20313f!important}
+input,select,textarea{background:#111c25;color:#dce7ef;border-color:#455765}.operation-dialog{background:#17232d;color:#dce7ef}.drawer-header,.drawer-footer,.operation-breakdown{background:#202e39;color:#dde7ef}.text-link,.text-button,.card-header>a{color:#e7b96a}
+@media(max-width:1000px){#risk-diagnostics{grid-template-columns:1fr}.risk-ranking{border-left:0;padding-left:0}.overview-grid{grid-template-columns:1fr}.cash-card,.exposure-card,.operations-card{grid-column:1;grid-row:auto}.stress-cell strong{font-size:15px}}
+@media(max-width:560px){.stress-cells{grid-template-columns:1fr}.stress-cell{display:flex;align-items:center;justify-content:space-between;padding:10px}.stress-cell strong{margin:0}.risk-workbench>header{gap:8px}}
+@media print{body,.card,.risk-workbench,.metrics{background:white;color:black}.stress-cell{background:white;color:black}}
+/* Scenario updates remain legible and honor reduced-motion preferences. */
+@media(prefers-reduced-motion:no-preference){
+ .view.active{animation:desk-enter .24s ease-out}
+ .stress-cell,.risk-ranking button{transition:background .18s,outline-color .18s}
+ .risk-name i{transform-origin:left;animation:exposure-enter .35s ease-out}
+ .operation-dialog[open]{animation:desk-enter .18s ease-out}
+ @keyframes desk-enter{from{opacity:.25;transform:translateY(6px)}to{opacity:1;transform:none}}
+ @keyframes exposure-enter{from{transform:scaleX(.1)}to{transform:scaleX(1)}}
+}
+.topbar{background:#18242e;border-color:#31404d}.breadcrumb strong{color:#d4dfe7}.breadcrumb,.edition,.source-pill{color:#a5b6c5}
+.app .field-note,.app .chart-note,.app .subtle,.app .metric small,.app td small,.app .table-footer,.app .chart-footer,.app .currency-row-top small,.app .coverage-key,.app .page-heading p,.app .data-line small,.app .source-description,.app .audit-row,.app .audit-row time,.app .scenario-slider small{color:#a3b4c3!important}
+.field input,.field select,.filter-bar input,.filter-bar select,.scenario-save input{background:#111c25;color:#dce7ef;border-color:#455765}

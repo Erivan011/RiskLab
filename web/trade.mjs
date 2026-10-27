@@ -203,6 +203,7 @@ function render() {
     `Vencidos entram na data-base. ${r.beyondHorizon ? `${r.beyondHorizon} compromisso(s) após o horizonte não entram nesta curva.` : "Inclui todos os vencimentos em aberto no horizonte."} Recebimentos futuros são premissas fictícias editáveis.`;
   renderCashChart();
   renderInvestigation();
+  renderDiagnostics();
   $("currency-exposure").innerHTML = r.currencies
     .map((c, i) => {
       const principal = r.rows
@@ -948,3 +949,13 @@ async function initialize() {
 initialize();
 
 $("open-import").onclick = () => $("import-csv").click();
+
+function renderDiagnostics() {
+  const stress = [-.1, -.05, 0, .05, .1].map(shock => ({shock, analysis: analyzeTrade({operations,rates,shocks:{USD:shock,EUR:shock,GBP:shock},asOf:demo.asOf,openingCashBrl:openingCash,receipts,horizon})}));
+  const totalExposure = result.uncoveredBrl;
+  const concentration = [...result.rows].sort((a,b)=>b.uncoveredBrl-a.uncoveredBrl).slice(0,5);
+  const maximum = Math.max(1,...concentration.map(r=>r.uncoveredBrl));
+  $('risk-diagnostics').innerHTML = `<div class="stress-matrix"><h3>Teste de liquidez</h3><p>Mesmo choque nas três moedas · ${horizon} dias</p><div class="stress-cells">${stress.map(({shock,analysis:a})=>`<button data-stress="${shock}" class="stress-cell ${a.minimumCashCents<0?'breach':''}"><small>Câmbio ${shock>0?'+':''}${Math.round(shock*100)}%</small><strong>${money(a.minimumCashCents/100)}</strong><span>${a.firstShortfall?'Déficit '+date(a.firstShortfall):'Sem déficit'}</span></button>`).join('')}</div><p>Menor saldo após recebimentos e pagamentos. Clique para aplicar; sem probabilidades ou previsão de mercado.</p></div><div class="risk-ranking"><h3>Maiores exposições descobertas</h3><p>Principal ao câmbio de referência · clique para abrir</p>${concentration.map((r,i)=>`<button data-risk-operation="${esc(r.id)}"><span class="rank">0${i+1}</span><span class="risk-name"><b>${esc(r.supplier)}</b><small>${esc(r.id)} · ${r.currency} · ${date(r.dueDate)}</small><i style="width:${100*r.uncoveredBrl/maximum}%"></i></span><span><b>${money(r.uncoveredBrl)}</b><small>${totalExposure?Math.round(100*r.uncoveredBrl/totalExposure):0}% do descoberto</small></span></button>`).join('')}</div>`;
+  document.querySelectorAll('[data-stress]').forEach(button=>button.onclick=()=>{ const shock=Number(button.dataset.stress); shocks={USD:shock,EUR:shock,GBP:shock};syncInputs();recalculate();announce('Choque de '+Math.round(shock*100)+'% aplicado às três moedas.'); });
+  document.querySelectorAll('[data-risk-operation]').forEach(button=>button.onclick=()=>openOperation(button.dataset.riskOperation));
+}
