@@ -13,7 +13,7 @@ java -cp java-risk/out risklab.ExposureTest
 ```
 
 `sql/exposure.sql` defines a PostgreSQL schema and a grouped exposure view.
-This module is not yet an HTTP API and is not connected to the online Worker.
+The HTTP API is implemented; production deployment awaits Render repository access.
 Validated locally with Java 17: compilation, domain checks, HTTP health and
 POST costing endpoint. A standalone JDK was used because package installation
 was restricted. The Java API is not deployed online.
@@ -30,3 +30,7 @@ wired to JDBC. The hosted browser demo still uses the tested JavaScript engine.
 A Dockerfile and a Java CI job compile and run checks before release. This is
 an initial API, not a production trading service; portfolio authentication,
 request timeouts, deployment and browser integration remain follow-up work.
+
+## Browser verification integration
+
+The Worker proxy `/api/java/price` uses `JAVA_RISK_ORIGIN` (an HTTPS onrender.com origin). The browser sends only the selected demo payment and checks base, stressed cost and impact against the Java result. Missing configuration returns 503; failures are never reported as successful Java calculations. The Render service creation was rejected because the private repository was unfetchable. No service was created.

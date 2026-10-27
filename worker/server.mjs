@@ -101,6 +101,21 @@ async function currentMarket() {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    if (url.pathname === "/api/java/price") {
+      if (request.method !== "POST") return new Response("POST required", {status:405});
+      const origin = env?.JAVA_RISK_ORIGIN;
+      if (!origin || !/^https:\/\/[a-z0-9-]+\.onrender\.com$/.test(origin)) return Response.json({error:"Java API not configured"},{status:503});
+      if (Number(request.headers.get("content-length") || 0) > 4096) return new Response("Too large",{status:413});
+      const bytes = new Uint8Array(await request.arrayBuffer());
+      if (bytes.length > 4096) return new Response("Too large",{status:413});
+      try {
+        const upstream = await fetch(origin + "/api/price", {method:"POST",headers:{"content-type":"application/x-www-form-urlencoded"},body:bytes,signal:AbortSignal.timeout(18000),redirect:"error"});
+        if (!upstream.ok) return Response.json({error:"Java API rejected input"},{status:upstream.status===400?400:502});
+        const data=await upstream.json();
+        if(data.engine!=="java-bigdecimal"||![data.baseline,data.stressed,data.impact].every(Number.isFinite)) throw Error("Invalid upstream");
+        return Response.json(data,{headers:{"cache-control":"no-store"}});
+      } catch {return Response.json({error:"Java API unavailable"},{status:502});}
+    }
     if (!["GET", "HEAD"].includes(request.method))
       return new Response("Método não permitido", { status: 405 });
     if (url.pathname === "/api/market") {

@@ -1,3 +1,4 @@
+import { verifyJavaPrice } from "./java-pricing.mjs";
 import {
   analyzeTrade,
   priceOperation,
@@ -957,5 +958,9 @@ function renderDiagnostics() {
   const maximum = Math.max(1,...concentration.map(r=>r.uncoveredBrl));
   $('risk-diagnostics').innerHTML = `<div class="stress-matrix"><h3>Teste de liquidez</h3><p>Mesmo choque nas três moedas · ${horizon} dias</p><div class="stress-cells">${stress.map(({shock,analysis:a})=>`<button data-stress="${shock}" class="stress-cell ${a.minimumCashCents<0?'breach':''}"><small>Câmbio ${shock>0?'+':''}${Math.round(shock*100)}%</small><strong>${money(a.minimumCashCents/100)}</strong><span>${a.firstShortfall?'Déficit '+date(a.firstShortfall):'Sem déficit'}</span></button>`).join('')}</div><p>Menor saldo após recebimentos e pagamentos. Clique para aplicar; sem probabilidades ou previsão de mercado.</p></div><div class="risk-ranking"><h3>Maiores exposições descobertas</h3><p>Principal ao câmbio de referência · clique para abrir</p>${concentration.map((r,i)=>`<button data-risk-operation="${esc(r.id)}"><span class="rank">0${i+1}</span><span class="risk-name"><b>${esc(r.supplier)}</b><small>${esc(r.id)} · ${r.currency} · ${date(r.dueDate)}</small><i style="width:${100*r.uncoveredBrl/maximum}%"></i></span><span><b>${money(r.uncoveredBrl)}</b><small>${totalExposure?Math.round(100*r.uncoveredBrl/totalExposure):0}% do descoberto</small></span></button>`).join('')}</div>`;
   document.querySelectorAll('[data-stress]').forEach(button=>button.onclick=()=>{ const shock=Number(button.dataset.stress); shocks={USD:shock,EUR:shock,GBP:shock};syncInputs();recalculate();announce('Choque de '+Math.round(shock*100)+'% aplicado às três moedas.'); });
+  const javaCheck=document.createElement('button'); javaCheck.className='button secondary'; javaCheck.textContent='Conferir maior exposição no motor Java';
+  const javaStatus=document.createElement('p');javaStatus.setAttribute('role','status');
+  $('risk-diagnostics').append(javaCheck,javaStatus);
+  javaCheck.onclick=async()=>{const row=concentration[0];if(!row){javaStatus.textContent='Nenhuma operação em aberto.';return;}javaCheck.disabled=true;javaStatus.textContent='Consultando API Java…';try{await verifyJavaPrice(row,shocks[row.currency]??0);javaStatus.textContent='Cálculo Java conferido: base, cenário e impacto coincidem em centavos para '+row.id+'.';}catch(error){javaStatus.textContent=error.message;}finally{javaCheck.disabled=false;}};
   document.querySelectorAll('[data-risk-operation]').forEach(button=>button.onclick=()=>openOperation(button.dataset.riskOperation));
 }
