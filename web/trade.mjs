@@ -62,8 +62,8 @@ let shocks = { USD: 0, EUR: 0, GBP: 0 },
 const viewNames = {
   overview: [
     "Visão geral",
-    "Exposição & caixa",
-    "Do câmbio ao pagamento. Cada compromisso no seu contexto.",
+    "Mesa de câmbio",
+    "Pagamentos, posições e liquidez em uma única mesa.",
   ],
   operations: [
     "Operações",
@@ -202,6 +202,7 @@ function render() {
   $("cash-note").textContent =
     `Vencidos entram na data-base. ${r.beyondHorizon ? `${r.beyondHorizon} compromisso(s) após o horizonte não entram nesta curva.` : "Inclui todos os vencimentos em aberto no horizonte."} Recebimentos futuros são premissas fictícias editáveis.`;
   renderCashChart();
+  renderInvestigation();
   $("currency-exposure").innerHTML = r.currencies
     .map((c, i) => {
       const principal = r.rows
@@ -250,6 +251,64 @@ function table(target, rows) {
     .forEach((b) =>
       b.addEventListener("click", () => openOperation(b.dataset.open)),
     );
+}
+function renderInvestigation() {
+  const counterfactual = analyzeTrade({
+    operations,
+    rates,
+    shocks: { USD: 0.1, EUR: 0, GBP: 0 },
+    asOf: demo.asOf,
+    openingCashBrl: openingCash,
+    receipts,
+    horizon: 90,
+  });
+  const day = counterfactual.firstShortfall;
+  const candidates = counterfactual.rows.filter((row) =>
+    day
+      ? (row.dueDate < demo.asOf ? demo.asOf : row.dueDate) === day
+      : row.shockImpactCents > 0,
+  );
+  const operation = candidates.sort(
+    (a, b) => b.scenarioCents - a.scenarioCents,
+  )[0];
+  const active =
+    shocks.USD === 0.1 &&
+    shocks.EUR === 0 &&
+    shocks.GBP === 0 &&
+    horizon === 90;
+  $("investigation-summary").innerHTML =
+    `O custo aumenta <strong>${money(counterfactual.shockImpactCents / 100)}</strong>. ` +
+    (day
+      ? `O primeiro déficit aparece em <strong>${date(day)}</strong>${operation ? `, data do pedido <strong>${esc(operation.id)}</strong>` : ""}.`
+      : `O menor saldo fica em <strong>${money(counterfactual.minimumCashCents / 100)}</strong>, sem déficit.`) +
+    '<span class="investigation-foot">Hipótese USD +10% · demais moedas constantes · 90 dias</span>';
+  $("investigate-usd").disabled = false;
+  $("investigate-usd").textContent = active
+    ? "Voltar ao cenário-base"
+    : "Investigar o cenário →";
+  $("investigate-usd").onclick = () => {
+    shocks = active ? { USD: 0, EUR: 0, GBP: 0 } : { USD: 0.1, EUR: 0, GBP: 0 };
+    horizon = 90;
+    syncInputs();
+    recalculate();
+    announce(
+      active
+        ? "Cenário-base restaurado."
+        : "Choque de 10% no dólar aplicado à carteira e à curva de caixa.",
+    );
+  };
+  let detail = $("investigation-detail");
+  if (!detail) {
+    detail = document.createElement("button");
+    detail.id = "investigation-detail";
+    detail.className = "text-button";
+    $("investigation").append(detail);
+  }
+  detail.hidden = !operation;
+  detail.textContent = operation ? "Abrir " + operation.id : "";
+  detail.onclick = () => {
+    if (operation) openOperation(operation.id);
+  };
 }
 function renderOperations() {
   if (!rates) return;
