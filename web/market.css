@@ -1,0 +1,581 @@
+.terminal-market {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+
+  overflow: hidden;
+  margin: 16px 0 28px;
+}
+
+.market-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--line);
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 11px;
+  color: var(--muted);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.market-status span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-secondary);
+}
+
+.market-status span::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+
+  animation: none;
+}
+
+
+
+.quote-tape {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: #090e18;
+  color: #f8fafc;
+  border-bottom: 1px solid var(--line);
+}
+
+.tape-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-right: 1px solid var(--line);
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 12px;
+  transition: background var(--transition-fast);
+}
+
+.tape-item:last-child {
+  border-right: none;
+}
+
+.tape-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.tape-item span:first-child {
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 0.8px;
+}
+
+.tape-item strong {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.quote-tape .up {
+  color: var(--green-text);
+  font-weight: 700;
+  background: var(--green-bg);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--green-border);
+}
+
+.quote-tape .down {
+  color: var(--red-text);
+  font-weight: 700;
+  background: var(--red-bg);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--red-border);
+}
+
+.up {
+  color: var(--green-text);
+  font-weight: 700;
+}
+
+.down {
+  color: var(--red-text);
+  font-weight: 700;
+}
+
+.market-grid {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  min-height: 480px;
+}
+
+.watchlist {
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+}
+
+.watch-heading {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.watch-button {
+  display: block;
+  text-align: left;
+  padding: 20px;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+  cursor: pointer;
+}
+
+.watch-button:hover:not(.active) {
+  background: var(--surface-hover);
+}
+
+.watch-button.active {
+  background: var(--surface-card);
+  border-left: 4px solid var(--accent);
+
+}
+
+.watch-button .watch-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 11px;
+  margin-bottom: 4px;
+}
+
+.watch-button .watch-top strong {
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.watch-name {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.watch-price {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.watch-date {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 10px;
+  color: var(--muted-light);
+  margin-top: 6px;
+}
+
+.market-chart-panel {
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+}
+
+.market-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.market-symbol {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.market-price {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 40px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -1.2px;
+  line-height: 1.1;
+  margin-bottom: 6px;
+
+}
+
+.market-chart-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.market-chart-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+}
+
+.market-chart-controls select {
+  height: 36px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--surface-subtle);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.market-chart-controls select:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+}
+
+.market-price-note {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 11px;
+  color: var(--accent);
+  padding: 8px 14px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  margin: 14px 0 16px;
+  display: inline-block;
+}
+
+.market-readout {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin-top: 16px;
+}
+
+.market-readout > div span {
+  display: block;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.market-readout > div strong {
+  display: block;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.market-chart-sources {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 10px;
+  color: var(--muted-light);
+  margin-top: 14px;
+  letter-spacing: 0.5px;
+}
+
+.market-data-warning {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 12px 0 24px;
+  line-height: 1.6;
+}
+
+.exposure-band {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin: 18px 0 24px;
+}
+
+.exposure-band > div {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.exposure-band > div:hover {
+  transform: none;
+  border-color: var(--accent-border);
+
+}
+
+.exposure-band > div span {
+  display: block;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.exposure-band > div strong {
+  display: block;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 24px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+
+.exposure-band > div small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted-light);
+  line-height: 1.4;
+}
+
+.position-direction {
+  height: 36px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-subtle);
+  color: #ffffff;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.position-direction:focus {
+  border-color: var(--accent);
+
+}
+
+.portfolio-input {
+  height: 38px;
+  width: 140px;
+  padding: 0 12px;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: right;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: #ffffff;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.portfolio-input:focus {
+  border-color: var(--accent);
+
+}
+
+.position-notional,
+.position-price,
+.position-delta {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.position-pnl {
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-weight: 800;
+}
+
+.hedge-control {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.hedge-control label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+}
+
+.hedge-control input {
+  height: 42px;
+  padding: 0 12px;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 18px;
+  font-weight: 700;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+  color: #ffffff;
+}
+
+.coverage-comparison {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 18px 0;
+}
+
+.coverage-comparison > div {
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.coverage-comparison > div strong {
+  display: block;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 26px;
+  font-weight: 800;
+  margin-top: 6px;
+}
+
+.cone-legend {
+  display: flex;
+  justify-content: space-between;
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin: 10px 0 6px;
+}
+
+.market-bullet {
+  background: var(--surface-subtle);
+  border-left: 3px solid var(--accent);
+  padding: 14px 18px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 13px;
+  color: var(--ink-secondary);
+  line-height: 1.6;
+  margin-top: 20px;
+}
+
+@media (max-width: 900px) {
+  .market-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .watchlist {
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    flex-direction: row;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .watchlist::-webkit-scrollbar {
+    display: none;
+  }
+
+  .watch-button {
+    flex: 1;
+    min-width: 170px;
+    border-bottom: none;
+    border-right: 1px solid var(--line);
+  }
+
+  .watch-button.active {
+    border-left: none;
+    border-bottom: 4px solid var(--accent);
+  }
+
+  .market-readout {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .exposure-band {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .quote-tape {
+    grid-template-columns: 1fr;
+  }
+
+  .tape-item {
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    padding: 12px 18px;
+  }
+
+  .tape-item:last-child {
+    border-bottom: none;
+  }
+
+  .market-chart-panel {
+    padding: 18px 16px;
+  }
+
+  .market-price {
+    font-size: 32px;
+  }
+
+  .market-readout {
+    grid-template-columns: 1fr;
+  }
+
+  .exposure-band {
+    grid-template-columns: 1fr;
+  }
+
+  .hedge-control,
+  .coverage-comparison {
+    grid-template-columns: 1fr;
+  }
+
+  .portfolio-input {
+    width: 110px;
+  }
+}
+
+.market-status[data-state="updated"] span::before { background: var(--green); }
+.market-status[data-state="loading"] span::before { background: var(--muted); }
+.market-status[data-state="error"] span::before { background: var(--red); }
+#market-price-chart:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+#market-notice:empty { display: none; }
+.market-notice { padding: 10px 14px; border-left: 2px solid var(--gold); color: var(--ink-secondary); background: var(--gold-bg); font-size: 13px; }

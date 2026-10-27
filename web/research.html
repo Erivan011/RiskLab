@@ -1,0 +1,1027 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="Composição cambial, backtesting e cenários com dados oficiais BCB."
+    />
+    <meta name="theme-color" content="#0b0f17" />
+    <title>RiskLab | Laboratório de risco cambial</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./market.css" />
+    <link rel="stylesheet" href="./desk.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Ir para o conteúdo</a>
+    <header class="masthead">
+      <a class="wordmark" href="./" aria-label="RiskLab início"
+        >risklab<span class="fx-stamp">FX</span></a
+      >
+      <div class="masthead-description">
+        Mesa de câmbio &amp; risco<br /><strong
+          >Dados de mercado · cenários de exposição</strong
+        >
+      </div>
+      <div class="masthead-meta">
+        ERIVAN SANTOS MARQUES<br /><span
+          >BCB / SGS · DIVULGAÇÕES CORPORATIVAS</span
+        >
+      </div>
+    </header>
+    <div class="shell" data-section="company">
+      <main id="main-content" tabindex="-1">
+        <div class="title-row">
+          <div>
+            <div class="eyebrow">
+              RISCO CAMBIAL / <span id="breadcrumb">ESTUDO SUZANO</span>
+            </div>
+            <h1 id="page-title">Suzano: câmbio, balanço e caixa</h1>
+            <p class="subtitle" id="page-subtitle">
+              Uma investigação financeira com dados públicos de uma companhia brasileira.
+            </p>
+          </div>
+          <button class="btn" id="export">↓ Exportar análise</button>
+          <button class="btn" id="export-current" disabled>
+            Exportar carteira ↓
+          </button>
+        </div>
+        <nav aria-label="Seções do laboratório" class="chapter-nav">
+          <button data-tab="company" class="active"><span>BR</span> Estudo Suzano</button>
+          <button data-tab="desk"><span>00</span> Mesa de análise</button>
+          <button data-tab="market">
+            <span>01</span> Mercado</button
+          ><button data-tab="positions" class="">
+            <span>02</span> Posições</button
+          ><button data-tab="overview" class=""><span>03</span> Limite</button
+          ><button data-tab="exposure" class="">
+            <span>04</span> Composição</button
+          ><button data-tab="backtesting" class="">
+            <span>05</span> Evidências</button
+          ><button data-tab="stress" class=""><span>06</span> Choques</button
+          ><button data-tab="models" class=""><span>07</span> Pesquisa</button>
+        </nav>
+        <form id="configuration" class="toolbar query-strip">
+          <div class="toolbar-controls">
+            <label
+              >Exposição em reais<input
+                id="notional"
+                type="number"
+                min="1000"
+                max="1000000000000"
+                value="1000000"
+                step="1000"
+                required /></label
+            ><label
+              >Modelo de risco<select id="model">
+                <option value="historical">Simulação histórica</option>
+                <option value="gaussian">Normal móvel</option>
+                <option value="ewma">Normal EWMA</option>
+              </select></label
+            ><label
+              >Confiança<select id="confidence">
+                <option value="0.95">95%</option>
+                <option value="0.975">97,5%</option>
+                <option value="0.99" selected>99%</option>
+              </select></label
+            ><label
+              >Janela de estimação<select id="window">
+                <option value="126">126 observações</option>
+                <option value="252" selected>252 observações</option>
+                <option value="504">504 observações</option>
+              </select></label
+            ><label
+              >Avaliação<select id="period">
+                <option value="all">2023–2025</option>
+                <option>2023</option>
+                <option>2024</option>
+                <option>2025</option>
+              </select></label
+            >
+          </div>
+          <button type="submit" class="btn primary" id="apply">
+            Calcular exposição →
+          </button>
+        </form>
+        <div class="config-line">
+          <div class="micro" id="active-config">Carregando histórico…</div>
+          <code id="calculation-status" role="status" aria-live="polite"
+            >Inicializando motor</code
+          >
+        </div>
+        <p id="global-error" class="error" role="alert"></p>
+<section id="company" class="tab-page active" aria-label="Estudo independente Suzano">
+ <div class="desk-context"><span class="desk-tag">ESTUDO 01 / EMPRESA BRASILEIRA</span><span>SUZANO S.A. · BALANÇO CONSOLIDADO / 31.12.2025</span></div>
+ <div class="desk-brief"><div><span class="desk-overline">A PERGUNTA DE NEGÓCIO</span><h2>Por que o dólar pode favorecer a operação e pressionar o balanço?</h2><p>Exportações, dívida em moeda estrangeira e proteção de caixa exigem leituras diferentes. Este estudo começa pela reconciliação da exposição divulgada, antes de simular qualquer decisão.</p></div></div>
+ <div class="desk-kpis" id="company-kpis"></div><p id="company-error" class="error" role="alert"></p>
+ <div class="desk-layout">
+ <article class="desk-card"><header><div><span class="desk-overline">01 / EVIDÊNCIA</span><h2>Da divulgação à exposição líquida</h2></div><span id="company-reconciliation" class="desk-hint" role="status">Conferindo totais…</span></header><div id="company-positions"></div><p class="desk-footnote">Saldos expostos a moeda estrangeira, substancialmente USD. Derivativos entram na reconciliação contábil, mas não são tratados como nocionais ou sensibilidade linear.</p></article>
+ <article class="desk-card"><header><div><span class="desk-overline">02 / INTERPRETAÇÃO</span><h2>Três perguntas que não são equivalentes</h2></div></header><div class="company-question"><strong>O que acontece com o balanço?</strong><p>A conversão dos ativos e passivos muda com o câmbio. Um passivo líquido em moeda estrangeira pode gerar efeito contábil adverso quando o real se desvaloriza.</p></div><div class="company-question"><strong>O que acontece com a operação?</strong><p>A companhia descreve receitas relevantes de exportação negociadas em dólar e custos de produção em grande parte ligados ao real. Esse fluxo não cabe em uma fotografia do balanço.</p></div><div class="company-question"><strong>Quando o dinheiro entra ou sai?</strong><p>Depende de vencimentos, recebimentos, liquidação dos derivativos e custos. O valor justo de um derivativo não é seu fluxo de caixa imediato.</p></div><p class="desk-footnote">Contexto: nota 4.4.1. Interpretação independente; sem vínculo com a empresa.</p></article>
+ <section class="desk-card desk-scenario"><header><div><span class="desk-overline">03 / HIPÓTESE EXPLÍCITA</span><h2>Choque comum nas exposições sem derivativos</h2></div><span class="desk-hint">Sensibilidade estática · juros constantes · antes dos impostos</span></header><label class="company-shock-label">Variação do câmbio BRL por moeda estrangeira <output id="company-shock-label">+10%</output><input id="company-shock" type="range" min="-50" max="50" step="1" value="10" aria-label="Choque cambial no estudo Suzano, em porcentagem"></label><div class="desk-stress-results"><div><span>Efeito contábil estimado / sem derivativos</span><strong id="company-impact">—</strong></div><div><span>USD/BRL de referência no cenário</span><strong id="company-rate">—</strong></div></div><div id="company-effects"></div><p class="desk-footnote">Esta simulação aplica o mesmo choque proporcional às exposições não derivativas. Não reproduz a tabela de cenários adversos por rubrica da companhia. Não estima resultado total, caixa futuro, retorno da ação ou custo de hedge.</p></section>
+ <article class="desk-card"><header><div><span class="desk-overline">04 / RASTREABILIDADE</span><h2>Fonte, unidade e reconciliação</h2></div></header><p>Base histórica de 2025. Valores da fonte em milhares de reais, convertidos apenas na apresentação. Transcrição manual de oito rubricas, com testes que conferem ativos, passivos e saldo líquido.</p><a class="company-source" href="https://s201.q4cdn.com/761980458/files/doc_news/2026/02/DF/2025-12-DFP_Suzano_PT.pdf#page=105" target="_blank" rel="noopener noreferrer">Abrir demonstração oficial · nota 4.4.1 · página 105 do PDF ↗</a><p class="desk-footnote">Documento consultado em 27/10/2026. Data-base da exposição: 31/12/2025. Este recorte não representa a posição atual da tesouraria.</p></article>
+ <article class="desk-card"><header><div><span class="desk-overline">05 / ESCOPO DA INVESTIGAÇÃO</span><h2>O que falta para avaliar uma política de proteção</h2></div></header><p>Conciliar o cronograma da dívida aos recebimentos, modelar o ciclo da celulose e precificar os contratos com prazos, curvas e custos. Sem essas entradas, uma “cobertura ótima” seria uma conclusão sem suporte.</p><p class="desk-footnote">A mesa de simulação continua disponível no menu para hipóteses próprias, separada deste recorte da companhia.</p></article>
+ </div>
+</section>
+
+<section id="desk" class="tab-page" aria-label="Mesa de análise de risco">
+  <div class="desk-context"><span class="desk-tag">WORKSPACE / FX RISK</span><span id="desk-source" role="status">Carregando referências validadas…</span></div>
+  <div id="desk-error" class="error" role="alert"></div>
+  <div class="desk-brief"><div><span class="desk-overline">LEITURA DA CARTEIRA</span><h2 id="desk-verdict">Preparando a análise</h2><p id="desk-summary">As métricas serão calculadas com datas comuns às três moedas.</p></div><div class="desk-brief-aside"><span>Horizonte de risco</span><strong>1 dia</strong><span>Histórico · 99% de confiança</span></div></div>
+  <div class="desk-kpis" id="desk-kpis" aria-live="polite"></div>
+  <div class="desk-layout">
+    <section class="desk-card desk-position-card"><header><div><span class="desk-overline">01 / EXPOSIÇÃO</span><h2>O que está em risco</h2></div><span class="desk-hint">Carteira de trabalho</span></header>
+      <form id="desk-form">
+      <div class="desk-position-head"><span>Moeda / direção</span><span>Quantidade</span><span>Cobertura idealizada / %</span></div>
+      <div id="desk-inputs"></div>
+      <div class="desk-limit"><label>Orçamento de perda / BRL<input id="desk-budget" type="number" min="1" max="1000000000000" step="any" value="10000" required></label><button class="btn primary" type="submit">Recalcular análise</button></div>
+      <p id="desk-dirty" class="desk-hint" role="status">Altere as posições ou a cobertura para comparar o risco residual.</p></form>
+      <div class="desk-exposures" id="desk-exposures"></div>
+      <p class="desk-footnote">Receber = exposição positiva; pagar = negativa. Cobertura é uma neutralização linear didática, sem contrato, custo, prazo ou risco de base.</p>
+    </section>
+    <section class="desk-card"><header><div><span class="desk-overline">02 / ATRIBUIÇÃO</span><h2>De onde vem a perda de cauda</h2></div><span class="desk-hint">ES · carteira sem cobertura</span></header>
+      <div id="desk-attribution"></div><p id="desk-tail-note" class="desk-footnote"></p>
+      <div class="desk-compare" id="desk-compare"></div>
+    </section>
+    <section class="desk-card desk-distribution"><header><div><span class="desk-overline">DISTRIBUIÇÃO HISTÓRICA</span><h2>O centro da distribuição não conta toda a história</h2></div><span class="desk-hint">Perdas positivas · ganhos negativos / BRL</span></header><svg id="desk-distribution-chart" viewBox="0 0 900 160" role="img" aria-label="Distribuição das perdas históricas e limiar de VaR da carteira sem cobertura"></svg><p id="desk-distribution-note" class="desk-footnote"></p></section>
+    <section class="desk-card desk-scenario"><header><div><span class="desk-overline">03 / LABORATÓRIO DE ESTRESSE</span><h2>Teste uma hipótese, veja o impacto</h2></div><span class="desk-hint">Choques independentes por moeda</span></header>
+      <div id="desk-shocks" class="desk-shocks"></div>
+      <div class="desk-stress-results" id="desk-stress-results"></div>
+      <div class="desk-matrix-layout"><div><div class="desk-matrix-head"><h3>Mapa de perda e ganho</h3><span>Linhas: EUR · Colunas: USD</span></div><div id="desk-matrix"></div><p class="desk-footnote">Carteira residual após cobertura. GBP usa o choque selecionado acima. Cada célula é uma reprecificação determinística em reais.</p></div><aside class="desk-reverse"><span class="desk-overline">ESTRESSE REVERSO</span><h3>Onde o orçamento se esgota?</h3><strong id="desk-reverse-value">—</strong><p id="desk-reverse-note"></p><span class="desk-footnote">Direções adversas por moeda. Sem probabilidades ou previsão de ocorrência.</span></aside></div>
+    </section>
+    <section class="desk-card"><header><div><span class="desk-overline">04 / CONTROLE DE DADOS</span><h2>O que sustenta os números</h2></div></header><div id="desk-data"></div><p class="desk-footnote">Referências diárias BCB/SGS. O recorte usa somente datas comuns; não preenche preços ausentes. Cotações de referência não são preços executáveis.</p></section>
+    <section class="desk-card"><header><div><span class="desk-overline">05 / CADERNO DE ANÁLISES</span><h2>Registre as suas hipóteses</h2></div><button id="desk-export" class="btn" disabled>Baixar análise JSON</button></header>
+      <form id="desk-save-form" class="desk-save"><label>Nome da análise<input id="desk-name" maxlength="80" placeholder="Ex.: redução da exposição ao dólar" required></label><button class="btn" id="desk-save" disabled>Registrar</button></form>
+      <p class="desk-footnote">Até oito registros neste navegador. Cada análise guarda posições, cobertura, choques e data das referências. Sem sincronização entre dispositivos.</p><div id="desk-journal"></div><p id="desk-journal-status" role="status"></p>
+    </section>
+  </div>
+</section>
+
+        <section
+          class="tab-page"
+          id="market"
+          aria-label="Mercado de câmbio"
+        >
+          <div class="market-status" data-state="loading">
+            <span id="market-status" role="status"
+              >Consultando referências diárias do Banco Central…</span
+            ><button class="btn" id="refresh-market">
+              Atualizar referências ↻
+            </button>
+          </div>
+          <p id="market-error" class="error" role="alert"></p>
+          <p id="market-notice" class="market-notice" role="status"></p>
+          <div class="terminal-market">
+            <div class="quote-tape" id="quote-tape"></div>
+            <div class="market-grid">
+              <div class="watchlist">
+                <div class="watch-heading">MOEDAS / BRL</div>
+                <div id="watchlist"></div>
+              </div>
+              <div class="market-chart-panel">
+                <div class="market-chart-header">
+                  <div>
+                    <div class="market-symbol" id="market-symbol">
+                      USD / BRL
+                    </div>
+                    <div class="market-price" id="market-price">—</div>
+                    <div id="market-change" class="micro">
+                      Cotação de referência
+                    </div>
+                  </div>
+                  <div class="market-chart-controls">
+                    <label
+                      >Janela<select id="market-period">
+                        <option value="21">1 mês</option>
+                        <option value="63">3 meses</option>
+                        <option value="252" selected>1 ano</option>
+                      </select></label
+                    ><label
+                      >Exibição<select id="market-mode">
+                        <option value="price">Preço em reais</option>
+                        <option value="compare">Comparar · base 100</option>
+                      </select></label
+                    >
+                  </div>
+                </div>
+                <svg
+                  id="market-price-chart" tabindex="0"
+                  viewbox="0 0 900 330"
+                  role="img"
+                  aria-label="Evolução das cotações diárias. Use as setas esquerda e direita para consultar as datas."
+                ></svg>
+                <div id="market-readout" class="market-price-note">
+                  Passe sobre o gráfico para consultar a referência da data.
+                </div>
+                <div class="market-readout">
+                  <div>
+                    <span>VARIAÇÃO · 21 OBS.</span
+                    ><strong id="market-month">—</strong>
+                  </div>
+                  <div>
+                    <span>VARIAÇÃO · 252 OBS.</span
+                    ><strong id="market-year">—</strong>
+                  </div>
+                  <div>
+                    <span>MÍNIMA · ÚLTIMAS 252 OBS.</span
+                    ><strong id="market-low">—</strong>
+                  </div>
+                  <div>
+                    <span>MÁXIMA · ÚLTIMAS 252 OBS.</span
+                    ><strong id="market-high">—</strong>
+                  </div>
+                </div>
+                <div class="market-chart-sources" id="market-asof"></div>
+              </div>
+            </div>
+          </div>
+          <p class="market-data-warning">
+            PTAX / referência diária de venda. Não é streaming intradiário nem
+            cotação executável. Uma seta indica a variação entre as duas últimas
+            observações publicadas, sem animações de preço fictícias.
+          </p>
+          <h2>Efeito sobre a carteira hipotética</h2>
+          <div class="exposure-band" id="market-exposure-band"></div>
+          <p class="micro" id="market-position-context"></p>
+          <div class="grid-two">
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>O que acontece se o câmbio mudar?</h2>
+                  <p class="micro">
+                    Choques simultâneos nas três moedas, nas posições atuais.
+                  </p>
+                </div>
+                <button class="btn" data-goto="positions">
+                  Editar posições →
+                </button>
+              </div>
+              <div class="table-wrap">
+                <table class="scenario-matrix">
+                  <thead>
+                    <tr>
+                      <th>Choque</th>
+                      <th>P&amp;L estimado</th>
+                      <th>Leitura</th>
+                    </tr>
+                  </thead>
+                  <tbody id="market-shocks"></tbody>
+                </table>
+              </div>
+            </article>
+            <article class="panel">
+              <h2>Faixa de cenários · 20 observações</h2>
+              <p class="micro">
+                1.000 trajetórias por bootstrap em blocos de cinco retornos. Não
+                é previsão de preço.
+              </p>
+              <svg
+                id="scenario-cone"
+                viewbox="0 0 600 220"
+                role="img"
+                aria-label="Faixa de cenários cambiais simulados"
+              ></svg>
+              <div class="cone-legend">
+                <span>Faixa central de 90% das trajetórias</span
+                ><span>Mediana</span>
+              </div>
+              <p class="micro" id="cone-description"></p>
+            </article>
+          </div>
+          <p class="market-bullet" id="market-reading"></p>
+        </section>
+        <section
+          class="tab-page"
+          id="positions"
+          aria-label="Posições em moeda estrangeira"
+        >
+          <div class="section-heading">
+            <h2>Recebimentos e pagamentos têm riscos opostos</h2>
+            <p class="subtitle">
+              Monte uma carteira hipotética. Receber moeda estrangeira
+              representa exposição positiva; pagar representa exposição
+              negativa. As posições são avaliadas na data comum mais recente
+              entre as três séries.
+            </p>
+          </div>
+          <article class="panel">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Moeda</th>
+                    <th>Direção</th>
+                    <th>Quantidade em moeda</th>
+                    <th>Referência BRL</th>
+                    <th>Exposição líquida BRL</th>
+                    <th>P&amp;L último intervalo</th>
+                    <th>Impacto de +1%</th>
+                  </tr>
+                </thead>
+                <tbody id="position-inputs">
+                  <tr data-position="USD">
+                    <td>USD / BRL</td>
+                    <td>
+                      <select
+                        class="position-direction"
+                        aria-label="Direção dólar"
+                      >
+                        <option value="1">Receber</option>
+                        <option value="-1">Pagar</option>
+                      </select>
+                    </td>
+                    <td>
+                      <input
+                        class="portfolio-input"
+                        aria-label="Quantidade dólar"
+                        type="number"
+                        min="0"
+                        max="1000000000"
+                        value="50000"
+                      />
+                    </td>
+                    <td class="position-price">—</td>
+                    <td class="position-notional">—</td>
+                    <td class="position-pnl">—</td>
+                    <td class="position-delta">—</td>
+                  </tr>
+                  <tr data-position="EUR">
+                    <td>EUR / BRL</td>
+                    <td>
+                      <select
+                        class="position-direction"
+                        aria-label="Direção euro"
+                      >
+                        <option value="1">Receber</option>
+                        <option value="-1" selected>Pagar</option>
+                      </select>
+                    </td>
+                    <td>
+                      <input
+                        class="portfolio-input"
+                        aria-label="Quantidade euro"
+                        type="number"
+                        min="0"
+                        max="1000000000"
+                        value="25000"
+                      />
+                    </td>
+                    <td class="position-price">—</td>
+                    <td class="position-notional">—</td>
+                    <td class="position-pnl">—</td>
+                    <td class="position-delta">—</td>
+                  </tr>
+                  <tr data-position="GBP">
+                    <td>GBP / BRL</td>
+                    <td>
+                      <select
+                        class="position-direction"
+                        aria-label="Direção libra"
+                      >
+                        <option value="1">Receber</option>
+                        <option value="-1">Pagar</option>
+                      </select>
+                    </td>
+                    <td>
+                      <input
+                        class="portfolio-input"
+                        aria-label="Quantidade libra"
+                        type="number"
+                        min="0"
+                        max="1000000000"
+                        value="15000"
+                      />
+                    </td>
+                    <td class="position-price">—</td>
+                    <td class="position-notional">—</td>
+                    <td class="position-pnl">—</td>
+                    <td class="position-delta">—</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="flex" style="margin-top: 18px">
+              <button class="btn primary" id="recalculate-positions">
+                Recalcular posições</button
+              ><button class="btn" id="export-positions">
+                Exportar carteira e risco ↓
+              </button>
+            </div>
+            <p id="position-error" class="error" role="alert"></p>
+          </article>
+          <div class="exposure-band" id="position-risk-band"></div>
+          <div class="grid-two">
+            <article class="panel">
+              <h2>Cobertura idealizada e risco residual</h2>
+              <p class="micro">
+                Hipótese didática: a fração coberta neutraliza exatamente o
+                choque de cada posição. Não precifica contrato, prazo, base,
+                prêmio ou contraparte.
+              </p>
+              <div class="hedge-control">
+                <label
+                  >Cobertura hipotética · %<input
+                    id="position-coverage"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="5"
+                    value="50" /></label
+                ><label
+                  >Choque simultâneo · %<input
+                    id="position-shock"
+                    type="number"
+                    min="-100"
+                    max="100"
+                    step="1"
+                    value="10"
+                /></label>
+              </div>
+              <div class="coverage-comparison">
+                <div>Sem cobertura<strong id="unhedged-pnl">—</strong></div>
+                <div>
+                  Com neutralização idealizada<strong id="hedged-pnl">—</strong>
+                </div>
+              </div>
+              <p class="micro" id="hedge-description"></p>
+              <p class="error" id="hedge-error" role="alert"></p>
+            </article>
+            <article class="panel">
+              <h2>Piores reprecificações da carteira atual</h2>
+              <p class="micro">
+                Reaplica retornos históricos aos nocionais atuais. Não
+                representa resultado real da carteira no passado.
+              </p>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Data do retorno</th>
+                      <th>P&amp;L hipotético</th>
+                    </tr>
+                  </thead>
+                  <tbody id="position-worst"></tbody>
+                </table>
+              </div>
+            </article>
+          </div>
+          <div class="highlight" id="position-risk-note"></div>
+        </section>
+        <section class="tab-page" id="overview" aria-label="Visão de risco">
+          <article class="decision-sheet">
+            <div class="sheet-heading">
+              <span>01 / CONFRONTO COM O LIMITE</span
+              ><span class="sheet-tag">Exposição comprada em moedas</span>
+            </div>
+            <div class="decision-grid">
+              <div class="decision-main">
+                <div class="micro">
+                  Perda estimada · VaR
+                  <span class="confidence-label">99%</span> · um intervalo
+                </div>
+                <div class="decision-value" id="metric-var">—</div>
+                <div class="metric-note" id="metric-var-note"></div>
+                <div class="decision-status" id="budget-status" role="status">
+                  Calculando…
+                </div>
+              </div>
+              <div class="budget-editor">
+                <label
+                  >Orçamento de perda diária · R$<input
+                    id="risk-budget"
+                    type="number"
+                    min="1000"
+                    max="1000000000000"
+                    step="1000"
+                    value="15000"
+                /></label>
+                <p class="micro">
+                  Limite ilustrativo editável; não é um parâmetro regulatório.
+                </p>
+                <div class="budget-meter">
+                  <span id="budget-meter-fill"></span>
+                </div>
+                <div class="budget-meter-label">
+                  <span id="budget-usage">—</span><span>100% do limite</span>
+                </div>
+                <p class="error" id="budget-error" role="alert"></p>
+              </div>
+            </div>
+            <div class="decision-details">
+              <div>
+                <span>Folga no VaR</span><strong id="budget-headroom">—</strong>
+              </div>
+              <div>
+                <span>Nocional que caberia no limite</span
+                ><strong id="budget-capacity">—</strong>
+              </div>
+              <div>
+                <span>Cauda estimada · ES</span
+                ><strong id="metric-es">—</strong>
+              </div>
+            </div>
+            <div class="analyst-reading" id="budget-reading"></div>
+            <p class="micro capacity-note">
+              Capacidade por escala linear, mantendo composição, janela e
+              modelo. Não inclui custos, não otimiza pesos e não garante perdas
+              dentro do limite.
+            </p>
+          </article>
+          <div class="historical-line">
+            <article class="metric">
+              <div class="metric-label">
+                Volatilidade anualizada<span class="pill neutral">√252</span>
+              </div>
+              <div class="metric-value accent" id="metric-vol">—</div>
+              <div class="metric-note">
+                Retornos da exposição no período avaliado.
+              </div>
+            </article>
+            <article class="metric">
+              <div class="metric-label">
+                Drawdown máximo<span class="pill neutral">Histórico</span>
+              </div>
+              <div class="metric-value red" id="metric-dd">—</div>
+              <div class="metric-note">
+                Queda composta desde o pico no período.
+              </div>
+            </article>
+          </div>
+          <div class="grid-main">
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>Quando a perda superou a estimativa</h2>
+                  <p class="micro">
+                    Passe sobre o gráfico para investigar cada observação.
+                  </p>
+                </div>
+                <div class="legend">
+                  <span
+                    ><i class="dot" style="background: #aaa69c"></i>Perda</span
+                  ><span
+                    ><i class="dot" style="background: var(--accent)"></i
+                    >VaR</span
+                  ><span
+                    ><i class="dot" style="background: var(--red)"></i
+                    >Exceção</span
+                  >
+                </div>
+              </div>
+              <svg
+                id="risk-chart"
+                viewbox="0 0 900 275"
+                role="img"
+                aria-label="Perdas e VaR ao longo do tempo"
+              ></svg>
+              <div class="chart-footer date-labels"></div>
+              <div id="chart-readout" class="chart-readout">
+                Valores em % do nocional. Ganhos aparecem como perdas negativas.
+              </div>
+            </article>
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>O que as exceções dizem</h2>
+                  <p class="micro">Frequência e independência das exceções.</p>
+                </div>
+                <span class="pill" id="coverage-pill">—</span>
+              </div>
+              <div class="number" id="coverage-count">—</div>
+              <p class="micro" id="coverage-expectation"></p>
+              <div class="rule"></div>
+              <div class="row-label">
+                <span>Kupiec · cobertura</span><strong id="kupiec">—</strong>
+              </div>
+              <div class="row-label">
+                <span>Independência</span><strong id="independence">—</strong>
+              </div>
+              <div class="row-label">
+                <span>Cobertura condicional</span
+                ><strong id="conditional">—</strong>
+              </div>
+              <div class="rule"></div>
+              <p class="micro">
+                p &lt; 0,05 sinaliza evidência contra a hipótese. p alto não
+                prova adequação. Poucas exceções reduzem o poder dos testes.
+              </p>
+            </article>
+          </div>
+          <div class="grid-two">
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>Trajetória de drawdown</h2>
+                  <p class="micro">
+                    Exposição rebalanceada; pico reiniciado no período.
+                  </p>
+                </div>
+                <span class="pill neutral">Sem carry e custos</span>
+              </div>
+              <svg
+                id="drawdown-chart"
+                viewbox="0 0 600 190"
+                role="img"
+                aria-label="Evolução do drawdown"
+              ></svg>
+              <div class="chart-footer date-labels"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>Concentração por fator de risco</h2>
+                  <p class="micro">
+                    Decomposição de Euler · janela anterior à última previsão.
+                  </p>
+                </div>
+                <button class="btn" data-goto="exposure">Detalhar →</button>
+              </div>
+              <div id="risk-contribution-bars"></div>
+              <div class="rule"></div>
+              <p class="micro">
+                Participação na volatilidade, que pode diferir do peso
+                financeiro. Não é uma atribuição do VaR histórico.
+              </p>
+            </article>
+          </div>
+        </section>
+        <section
+          class="tab-page"
+          id="exposure"
+          aria-label="Composição da exposição"
+        >
+          <div class="section-heading">
+            <h2>Construa a exposição e observe a diversificação</h2>
+            <p class="subtitle">
+              Pesos comprados, sem alavancagem. A soma deve ser 100%. As
+              mudanças recalculam retornos, risco e exceções de todo o período.
+            </p>
+          </div>
+          <article class="panel">
+            <div class="panel-head">
+              <h2>Pesos por moeda</h2>
+              <span class="pill neutral" id="weight-sum">Total: 100%</span>
+            </div>
+            <div class="weights">
+              <div class="weight-card">
+                <label
+                  >USD / BRL<input
+                    id="weight-usd"
+                    aria-label="Peso dólar em porcentagem"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value="50" /></label
+                ><small>Dólar americano · % do nocional</small>
+              </div>
+              <div class="weight-card">
+                <label
+                  >EUR / BRL<input
+                    id="weight-eur"
+                    aria-label="Peso euro em porcentagem"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value="30" /></label
+                ><small>Euro · % do nocional</small>
+              </div>
+              <div class="weight-card">
+                <label
+                  >GBP / BRL<input
+                    id="weight-gbp"
+                    aria-label="Peso libra em porcentagem"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    value="20" /></label
+                ><small>Libra esterlina · % do nocional</small>
+              </div>
+            </div>
+            <p class="error" id="weight-error" role="alert"></p>
+            <div class="flex">
+              <button class="btn primary" id="apply-weights">
+                Recalcular exposição</button
+              ><button class="btn" id="reset-weights">
+                Restaurar 50 / 30 / 20
+              </button>
+            </div>
+          </article>
+          <div class="grid-two">
+            <article class="panel">
+              <h2>Contribuição por moeda</h2>
+              <p class="micro">
+                Componentes anuais somam a volatilidade da janela estimada.
+              </p>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Moeda</th>
+                      <th>Peso</th>
+                      <th>Exposição R$</th>
+                      <th>Vol. componente</th>
+                      <th>Participação</th>
+                    </tr>
+                  </thead>
+                  <tbody id="contributions-table"></tbody>
+                </table>
+              </div>
+              <p class="micro">
+                Componente = peso × (Σw) / σ. A decomposição considera
+                covariâncias entre moedas.
+              </p>
+            </article>
+            <article class="panel">
+              <h2>Correlação entre fatores</h2>
+              <p class="micro">
+                Retornos na janela anterior à última estimativa.
+              </p>
+              <div id="correlation" class="heatmap"></div>
+              <div class="rule"></div>
+              <p class="micro">
+                Correlação é histórica e variável. Ativos fortemente
+                correlacionados podem oferecer pouca diversificação.
+              </p>
+            </article>
+          </div>
+        </section>
+        <section class="tab-page" id="backtesting" aria-label="Backtesting">
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Os modelos mantêm a cobertura esperada?</h2>
+                <p class="micro">
+                  Mesmos retornos e mesma configuração para os três estimadores.
+                </p>
+              </div>
+              <span class="pill neutral"
+                >Sem retorno do próprio dia no treino</span
+              >
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Estimador</th>
+                    <th>Exceções</th>
+                    <th>Taxa</th>
+                    <th>Esperada</th>
+                    <th>Kupiec · p</th>
+                    <th>Indep. · p</th>
+                    <th>Perda quantílica ↓</th>
+                  </tr>
+                </thead>
+                <tbody id="models-risk-table"></tbody>
+              </table>
+            </div>
+          </article>
+          <div class="grid-two">
+            <article class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>Registro de exceções</h2>
+                  <p class="micro">
+                    Ordenado por perda, da maior para a menor.
+                  </p>
+                </div>
+                <button class="btn" id="export-breaches">
+                  ↓ CSV de exceções
+                </button>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Perda</th>
+                      <th>VaR</th>
+                      <th>Excesso R$</th>
+                    </tr>
+                  </thead>
+                  <tbody id="breaches-table"></tbody>
+                </table>
+              </div>
+            </article>
+            <article class="panel">
+              <h2>Distribuição dos retornos</h2>
+              <p class="micro">
+                Frequência em 28 intervalos de amplitude igual.
+              </p>
+              <svg
+                id="histogram"
+                viewbox="0 0 600 240"
+                role="img"
+                aria-label="Histograma dos retornos"
+              ></svg>
+              <p class="micro" id="histogram-description"></p>
+              <div class="rule"></div>
+              <p class="micro">
+                Os testes apresentados avaliam VaR. Expected Shortfall não
+                recebe validação estatística específica nesta versão.
+              </p>
+            </article>
+          </div>
+        </section>
+        <section class="tab-page" id="stress" aria-label="Cenários de estresse">
+          <div class="grid-two">
+            <article class="panel">
+              <h2>Cenário determinístico</h2>
+              <p class="subtitle">
+                Defina uma variação simultânea das moedas em reais. O impacto
+                usa a exposição atual, sem probabilidades associadas.
+              </p>
+              <div class="spacer"></div>
+              <div class="scenario-grid">
+                <label
+                  >Choque USD · %<input
+                    id="shock-usd"
+                    type="number"
+                    min="-100"
+                    max="100"
+                    value="-10" /></label
+                ><label
+                  >Choque EUR · %<input
+                    id="shock-eur"
+                    type="number"
+                    min="-100"
+                    max="100"
+                    value="-7" /></label
+                ><label
+                  >Choque GBP · %<input
+                    id="shock-gbp"
+                    type="number"
+                    min="-100"
+                    max="100"
+                    value="-12"
+                /></label>
+              </div>
+              <p class="micro">
+                Variação negativa reduz o valor da posição comprada em moeda.
+              </p>
+              <div class="flex">
+                <button class="btn" data-shock="-5,-5,-5">
+                  Queda uniforme · 5%</button
+                ><button class="btn" data-shock="-10,-7,-12">
+                  Choque assimétrico</button
+                ><button class="btn" data-shock="10,10,10">
+                  Alta uniforme · 10%
+                </button>
+              </div>
+              <div class="rule"></div>
+              <div class="eyebrow">Impacto no nocional</div>
+              <div class="scenario-result" id="shock-result">—</div>
+              <p class="micro" id="shock-description"></p>
+              <p class="error" id="shock-error" role="alert"></p>
+            </article>
+            <article class="panel">
+              <h2>Repetição de dias observados</h2>
+              <p class="micro">
+                Piores retornos da composição no período escolhido.
+              </p>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Retorno</th>
+                      <th>Perda R$</th>
+                    </tr>
+                  </thead>
+                  <tbody id="historical-stress"></tbody>
+                </table>
+              </div>
+              <div class="rule"></div>
+              <div class="highlight">
+                Estresse e VaR respondem perguntas diferentes: um explora
+                impactos condicionais; o outro estima um quantil sob um modelo.
+              </div>
+            </article>
+          </div>
+        </section>
+        <section class="tab-page" id="models" aria-label="Modelos e dados">
+          <div class="warning">
+            O experimento de aprendizado de máquina é fixo: composição 50 / 30 /
+            20, validação 2021–2022 e teste 2023–2025. Os controles
+            exploratórios não treinam esse modelo novamente.
+          </div>
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Um modelo complexo supera a referência?</h2>
+                <p class="micro">
+                  Variância do próximo retorno. Seleção por QLIKE na validação.
+                </p>
+              </div>
+              <span class="pill">Walk-forward trimestral</span>
+            </div>
+            <div class="model-score">
+              <span class="micro">Selecionado na validação:</span
+              ><strong id="ml-champion"></strong>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Modelo</th>
+                    <th>QLIKE validação ↓</th>
+                    <th>QLIKE teste ↓</th>
+                    <th>MAE variância · teste ↓</th>
+                    <th>Decisão</th>
+                  </tr>
+                </thead>
+                <tbody id="ml-table"></tbody>
+              </table>
+            </div>
+            <p class="micro">
+              QLIKE pode ser negativo; menor é melhor. Retorno ao quadrado é um
+              proxy ruidoso da variância. O Gradient Boosting usa ligação
+              positiva para impedir variâncias negativas.
+            </p>
+          </article>
+          <div class="grid-two">
+            <article class="panel">
+              <h2>Protocolo temporal</h2>
+              <ol class="list">
+                <li>
+                  <strong>2016–2020:</strong> treino inicial e construção de
+                  features.
+                </li>
+                <li>
+                  <strong>2021–2022:</strong> seleção dos previsores por QLIKE.
+                </li>
+                <li>
+                  <strong>2023–2025:</strong> avaliação com a escolha
+                  preservada.
+                </li>
+                <li>Ajustes trimestrais usam apenas alvos já observados.</li>
+                <li>
+                  Features de t usam dados até t−1. O retorno de t também não
+                  entra na estimação do próprio VaR.
+                </li>
+              </ol>
+              <div class="highlight">
+                Testes automatizados alteram dados futuros e verificam que
+                previsões anteriores permanecem iguais.
+              </div>
+            </article>
+            <article class="panel">
+              <h2>Qualidade e procedência</h2>
+              <div class="trace">
+                <div>
+                  <span class="micro">Datas comuns</span
+                  ><strong id="data-rows">—</strong>
+                </div>
+                <div>
+                  <span class="micro">Séries oficiais</span><strong>3</strong>
+                </div>
+                <div>
+                  <span class="micro">Preenchimento</span
+                  ><strong>Nenhum</strong>
+                </div>
+              </div>
+              <div class="rule"></div>
+              <p class="micro" id="data-period"></p>
+              <div id="hashes"></div>
+            </article>
+          </div>
+          <article class="panel">
+            <h2>Limites e premissas</h2>
+            <ul class="list" id="limitations"></ul>
+            <p class="micro">
+              A exploração interativa não altera o protocolo publicado do
+              experimento. Não há seleção automática de ativos nem promessa de
+              retorno.
+            </p>
+          </article>
+        </section>
+        <div class="warning">
+          <strong>VaR não é perda máxima.</strong> O histórico usa exposição
+          comprada com pesos fixos; a carteira atual distingue recebimentos e
+          pagamentos. PTAX é referência, não preço executável. Juros, carry,
+          spreads, tributos e custos não estão incluídos.
+        </div>
+      </main>
+      <footer>
+        <span>RiskLab · Erivan Santos Marques · Estudo de risco de mercado</span
+        ><span
+          >Fonte:
+          <a
+            href="https://www.bcb.gov.br/estabilidadefinanceira/historicocotacoes"
+            target="_blank"
+            rel="noopener"
+            >Banco Central do Brasil / SGS</a
+          >
+          · Estudo Suzano: demonstração financeira de 2025 · Sem sinais de negociação</span
+        >
+      </footer>
+    </div>
+    <noscript>Ative JavaScript para calcular os cenários interativos.</noscript>
+    <script type="module" src="./company.mjs"></script>
+    <script type="module" src="./desk.mjs"></script>
+    <script type="module" src="./app.mjs"></script>
+    <script type="module" src="./market.mjs"></script>
+  </body>
+</html>

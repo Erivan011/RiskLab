@@ -1,0 +1,10 @@
+analysis/data/raw/*
+analysis/data/warehouse.sqlite
+analysis/reports/*
+!analysis/reports/.gitkeep
+__pycache__/
+*.pyc
+*.egg-info/
+
+worker/index.js
+dist/
