@@ -1,16 +1,31 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "company": "Aurora Componentes",
   "location": "Campinas · SP",
   "asOf": "2026-10-27",
-  "openingCashBrl": 155000,
+  "openingCashBrl": 255000,
   "disclosure": "Empresa, fornecedores, operações, custos e recebimentos inteiramente fictícios para demonstração. Referências cambiais BCB são apresentadas separadamente.",
   "receipts": [
-    { "date": "2026-11-05", "amountBrl": 42000 },
-    { "date": "2026-11-20", "amountBrl": 38000 },
-    { "date": "2026-12-05", "amountBrl": 45000 },
-    { "date": "2026-12-20", "amountBrl": 30000 },
-    { "date": "2027-01-05", "amountBrl": 35000 }
+    {
+      "date": "2026-11-05",
+      "amountBrl": 42000
+    },
+    {
+      "date": "2026-11-20",
+      "amountBrl": 38000
+    },
+    {
+      "date": "2026-12-05",
+      "amountBrl": 45000
+    },
+    {
+      "date": "2026-12-20",
+      "amountBrl": 30000
+    },
+    {
+      "date": "2027-01-05",
+      "amountBrl": 35000
+    }
   ],
   "operations": [
     {
@@ -180,6 +195,146 @@
       "status": "paid",
       "category": "Módulos de automação",
       "country": "França"
+    },
+    {
+      "id": "IMP-G101",
+      "supplier": "Shenzhen Motion",
+      "country": "China",
+      "currency": "USD",
+      "amount": 1800,
+      "dueDate": "2026-11-03",
+      "budgetRate": 5.25,
+      "localCostBrl": 800,
+      "hedgePercent": 0,
+      "hedgeRate": 5.3,
+      "status": "open",
+      "category": "Componentes industriais"
+    },
+    {
+      "id": "IMP-G102",
+      "supplier": "Volga Instruments",
+      "country": "Rússia",
+      "currency": "USD",
+      "amount": 1975,
+      "dueDate": "2026-11-05",
+      "budgetRate": 5.25,
+      "localCostBrl": 845,
+      "hedgePercent": 25,
+      "hedgeRate": 5.3,
+      "status": "open",
+      "category": "Componentes industriais"
+    },
+    {
+      "id": "IMP-G103",
+      "supplier": "Atlantic Controls",
+      "country": "Estados Unidos",
+      "currency": "USD",
+      "amount": 2150,
+      "dueDate": "2026-11-07",
+      "budgetRate": 5.25,
+      "localCostBrl": 890,
+      "hedgePercent": 50,
+      "hedgeRate": 5.3,
+      "status": "open",
+      "category": "Componentes industriais"
+    },
+    {
+      "id": "IMP-G104",
+      "supplier": "Deccan Sensors",
+      "country": "Índia",
+      "currency": "USD",
+      "amount": 2325,
+      "dueDate": "2026-11-09",
+      "budgetRate": 5.25,
+      "localCostBrl": 935,
+      "hedgePercent": 0,
+      "hedgeRate": 5.3,
+      "status": "open",
+      "category": "Componentes industriais"
+    },
+    {
+      "id": "IMP-G105",
+      "supplier": "Maple Circuits",
+      "country": "Canadá",
+      "currency": "USD",
+      "amount": 2500,
+      "dueDate": "2026-11-11",
+      "budgetRate": 5.25,
+      "localCostBrl": 980,
+      "hedgePercent": 25,
+      "hedgeRate": 5.3,
+      "status": "open",
+      "category": "Componentes industriais"
+    },
+    {
+      "id": "IMP-G106",
+      "supplier": "Torino Precision",
+      "country": "Itália",
+      "currency": "EUR",
+      "amount": 2675,
+      "dueDate": "2026-11-13",
+      "budgetRate": 6.0,
+      "localCostBrl": 1025,
+      "hedgePercent": 50,
+      "hedgeRate": 6.05,
+      "status": "open",
+      "category": "Componentes industriais"
+    },
+    {
+      "id": "IMP-G107",
+      "supplier": "Delta Components",
+      "country": "Países Baixos",
+      "currency": "EUR",
+      "amount": 2850,
+      "dueDate": "2026-12-15",
+      "budgetRate": 6.0,
+      "localCostBrl": 1070,
+      "hedgePercent": 0,
+      "hedgeRate": 6.05,
+      "status": "open",
+      "category": "Componentes industriais"
+    },
+    {
+      "id": "IMP-G108",
+      "supplier": "Alpine Systems",
+      "country": "Suíça",
+      "currency": "EUR",
+      "amount": 3025,
+      "dueDate": "2026-12-17",
+      "budgetRate": 6.0,
+      "localCostBrl": 1115,
+      "hedgePercent": 25,
+      "hedgeRate": 6.05,
+      "status": "open",
+      "category": "Componentes industriais"
+    },
+    {
+      "id": "IMP-G109",
+      "supplier": "Straits Automation",
+      "country": "Singapura",
+      "currency": "USD",
+      "amount": 3200,
+      "dueDate": "2026-12-19",
+      "budgetRate": 5.25,
+      "localCostBrl": 1160,
+      "hedgePercent": 50,
+      "hedgeRate": 5.3,
+      "status": "open",
+      "category": "Componentes industriais"
+    },
+    {
+      "id": "IMP-G110",
+      "supplier": "Southern Controls",
+      "country": "Austrália",
+      "currency": "USD",
+      "amount": 3375,
+      "dueDate": "2026-12-21",
+      "budgetRate": 5.25,
+      "localCostBrl": 1205,
+      "hedgePercent": 0,
+      "hedgeRate": 5.3,
+      "status": "open",
+      "category": "Componentes industriais"
     }
   ]
 }

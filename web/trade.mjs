@@ -45,6 +45,7 @@ const esc = (value) =>
     .replaceAll("'", "&#39;");
 const storeKey = "risklab.trade.workspace.v1",
   scenarioKey = "risklab.trade.scenarios.v1";
+let selectedCountry = '';
 let demo,
   operations = [],
   receipts = [],
@@ -205,6 +206,7 @@ function render() {
   renderCashChart();
   renderInvestigation();
   renderDiagnostics();
+  renderGlobal();
   $("currency-exposure").innerHTML = r.currencies
     .map((c, i) => {
       const principal = r.rows
@@ -963,4 +965,27 @@ function renderDiagnostics() {
   $('risk-diagnostics').append(javaCheck,javaStatus);
   javaCheck.onclick=async()=>{const row=concentration[0];if(!row){javaStatus.textContent='Nenhuma operação em aberto.';return;}javaCheck.disabled=true;javaStatus.textContent='Consultando API Java…';try{await verifyJavaPrice(row,shocks[row.currency]??0);javaStatus.textContent='Cálculo Java conferido: base, cenário e impacto coincidem em centavos para '+row.id+'.';}catch(error){javaStatus.textContent=error.message;}finally{javaCheck.disabled=false;}};
   document.querySelectorAll('[data-risk-operation]').forEach(button=>button.onclick=()=>openOperation(button.dataset.riskOperation));
+}
+
+function renderGlobal() {
+  const groups = new Map();
+  for (const row of result.rows) {
+    const country = row.country || 'Origem não informada';
+    if (!groups.has(country)) groups.set(country, {country,rows:[],cost:0,uncovered:0});
+    const group=groups.get(country);group.rows.push(row);group.cost+=row.scenarioCents;group.uncovered+=row.uncoveredBrl;
+  }
+  const countries=[...groups.values()].sort((a,b)=>b.uncovered-a.uncovered);
+  const total=result.uncoveredBrl;
+  const select=$('country-filter');
+  select.innerHTML='<option value="">Todos os países</option>'+countries.map(c=>`<option value="${esc(c.country)}">${esc(c.country)}</option>`).join('');
+  if(!groups.has(selectedCountry))selectedCountry='';select.value=selectedCountry;
+  select.onchange=()=>{selectedCountry=select.value;renderGlobal();};
+  $('global-summary').innerHTML=`<div><strong>${countries.length}</strong><span>países com compromissos</span></div><div><strong>${result.rows.length}</strong><span>pagamentos em aberto</span></div><div><strong>${money(total)}</strong><span>principal descoberto / BRL</span></div>`;
+  const shown=countries;
+  $('country-grid').innerHTML=shown.map((c,i)=>`<button class="country-tile ${selectedCountry===c.country?'selected':''}" data-country="${esc(c.country)}"><span class="country-index">${String(i+1).padStart(2,'0')} / ${[...new Set(c.rows.map(r=>r.currency))].join(' · ')}</span><strong>${esc(c.country)}</strong><span>${c.rows.length} pagamento(s) · ${total?(100*c.uncovered/total).toFixed(1):0}% da exposição</span><b>${money(c.uncovered)}</b><i style="width:${total?100*c.uncovered/total:0}%"></i></button>`).join('');
+  document.querySelectorAll('[data-country]').forEach(b=>b.onclick=()=>{selectedCountry=b.dataset.country;renderGlobal();});
+  const focus=groups.get(selectedCountry)||countries[0];
+  $('country-detail').innerHTML=focus?`<div class="eyebrow">${selectedCountry?'PAÍS SELECIONADO':'MAIOR EXPOSIÇÃO DESCOBERTA'}</div><h3>${esc(focus.country)}</h3><div class="country-cost">${money(focus.cost/100)}<small>custo total no cenário atual</small></div><p>${money(focus.uncovered)} de principal exposto ao câmbio de referência.</p><h4>Compromissos rastreáveis</h4>${focus.rows.sort((a,b)=>a.dueDate.localeCompare(b.dueDate)).map(row=>`<button data-global-open="${esc(row.id)}"><span>${esc(row.id)}<small>${esc(row.supplier)} · ${date(row.dueDate)}</small></span><b>${money(row.scenarioCents/100)}</b></button>`).join('')}<button id="clear-country" class="text-button">Ver todos os países →</button>`:'<p>Sem compromissos em aberto.</p>';
+  document.querySelectorAll('[data-global-open]').forEach(b=>b.onclick=()=>openOperation(b.dataset.globalOpen));
+  if($('clear-country'))$('clear-country').onclick=()=>{selectedCountry='';renderGlobal();};
 }
