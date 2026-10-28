@@ -76,12 +76,12 @@ npm run build
 npm run validate
 ```
 
-Os 59 testes JavaScript verificam estresse combinado, aporte intermediário com saldo final positivo, recebimentos anteriores à data-base, atribuição sequencial e reconciliação, além de proteção parcial/completa, exclusão de pagos, conservação de centavos e caixa, vencidos, corte de horizonte, pagamentos e recebimentos na mesma data, rejeição de CSV inválido e escape de fórmulas. A pesquisa mantém testes de ausência de vazamento temporal e comparação com a implementação Python.
+Os 64 testes JavaScript verificam estresse combinado, aporte intermediário com saldo final positivo, recebimentos anteriores à data-base, atribuição sequencial e reconciliação, além de proteção parcial/completa, exclusão de pagos, conservação de centavos e caixa, vencidos, corte de horizonte, pagamentos e recebimentos na mesma data, rejeição de CSV inválido e escape de fórmulas. A pesquisa mantém testes de ausência de vazamento temporal e comparação com a implementação Python.
 
 Detalhes de decisões e limitações: [docs/DECISIONS.md](docs/DECISIONS.md). Código sob licença MIT.
 
-## Proposta editorial (mockup separado)
+## Editorial e ambiente de operações
 
-`/editorial.html` apresenta a narrativa em quatro atos: situação, causas, hipóteses de proteção e método. O slider altera somente USD de 0 a 20%; EUR e GBP ficam constantes. A carteira e o snapshot são fixos, sem ler o workspace salvo. A tabela de proteção simula fixação USD a 0%, 50% e 100% na referência do snapshot, sem precificar um hedge contratável.
+A página principal (também em `/editorial.html`) apresenta a narrativa em quatro atos: situação, causas, hipóteses de proteção e método. O slider altera somente USD de 0 a 20%; EUR e GBP ficam constantes. A carteira e o snapshot são fixos, sem ler o workspace salvo. A tabela de proteção simula fixação USD a 0%, 50% e 100% na referência do snapshot, sem precificar um hedge contratável.
 
-O HTML é autossuficiente: conteúdo, SVGs, dados e motor estão embutidos, com estado inicial visível mesmo sem JavaScript. O build o gera a partir de `design/editorial.html`, `design/editorial-model.mjs` e do motor compartilhado. A imagem Open Graph é um PNG de 1200 × 627, construído com a mesma projeção de demonstração. A página principal permanece no ambiente de operações existente.
+O HTML é autossuficiente: conteúdo, SVGs, dados e motor estão embutidos, com estado inicial visível mesmo sem JavaScript. O build o gera a partir de `design/editorial.html`, `design/editorial-model.mjs` e do motor compartilhado. A imagem Open Graph é um PNG de 1200 × 627, construído com a mesma projeção de demonstração. O editorial abre em tema escuro por padrão; o botão de tema salva a preferência neste navegador. O ambiente completo de operações fica em `/operations.html`.

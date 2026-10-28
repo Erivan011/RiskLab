@@ -26,3 +26,10 @@ test('share image is served as intact 1200 by 627 PNG bytes, including HEAD',asy
  assert.deepEqual([...bytes.subarray(0,8)],[137,80,78,71,13,10,26,10]);assert.equal(bytes.readUInt32BE(16),1200);assert.equal(bytes.readUInt32BE(20),627);
  const head=await worker.fetch(new Request('https://risklab.test/editorial-share.png',{method:'HEAD'}));assert.equal((await head.arrayBuffer()).byteLength,0);
 });
+test('editorial is the public landing while the operational workspace remains reachable',async()=>{
+ const {default:worker}=await import('../worker/index.js');
+ const landing=await worker.fetch(new Request('https://risklab.test/'));
+ const html=await landing.text();assert.match(html,/id="usd-shock"/);assert.match(html,/href="\.\/operations\.html"/);
+ const operations=await worker.fetch(new Request('https://risklab.test/operations.html'));
+ assert.equal(operations.status,200);assert.match(await operations.text(),/id="operations-table"/);
+});

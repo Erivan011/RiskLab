@@ -12,4 +12,5 @@ const engine=(await readFile('web/trade-engine.mjs','utf8')).replaceAll('export 
 const model=(await readFile('design/editorial-model.mjs','utf8')).replace(/^import .*;\n/m,'').replaceAll('export ','');
 html=html.replace('/*__ENGINE__*/',()=>engine).replace('/*__INPUT__*/',()=>JSON.stringify(input).replaceAll('<','\\u003c')).replace('/*__MODEL__*/',()=>model);
 await writeFile('web/editorial.html',html);
+await writeFile('web/index.html',html);
 console.log('Editorial HTML: fully populated, standalone and interactive.');
