@@ -130,7 +130,7 @@ export default {
       });
       return response;
     }
-    const path = url.pathname === "/" ? "/index.html" : url.pathname;
+    const path = ["/", "/index.html"].includes(url.pathname) ? "/analytics.html" : url.pathname;
     const asset = ASSETS[path];
     if (!asset) return new Response("Não encontrado", { status: 404 });
     const body = asset.encoding === "base64"

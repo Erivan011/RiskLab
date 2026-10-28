@@ -16,7 +16,7 @@ test('market widget configuration sends a public symbol allowlist, never cash po
 });
 test('global markets are served separately from the dated simulation and preserve attribution',async()=>{
  const {default:worker}=await import('../worker/index.js');
- const landing=await worker.fetch(new Request('https://risklab.test/'));
+ const landing=await worker.fetch(new Request('https://risklab.test/editorial.html'));
  const html=await landing.text();assert.match(html,/id="mercados"/);assert.match(html,/não alimenta automaticamente a simulação/);
  assert.match(html,/Mercados por TradingView/);assert.match(html,/id="market-provider-status"/);
  for(const name of ['global-markets.mjs','global-market-config.mjs']){

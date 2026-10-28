@@ -149,3 +149,5 @@ O laboratório consulta `/api/market` ao abrir, a cada 15 minutos quando visíve
 “Acompanhar o ano mais recente” atualiza o intervalo de avaliação. Alterar datas desativa esse acompanhamento, preservando a análise escolhida. CSV permanece local e não recebe atualização BCB. Falhas e atualização parcial são informadas; o último histórico válido permanece disponível. O botão manual consulta a mesma API, respeitando seu cache.
 
 Para renovar o snapshot offline antes de publicar: `node scripts/refresh-market.mjs`, seguido de `npm test`. A atualização normal do site não depende de nova publicação. A memória JSON e o relatório registram a consulta, estado da fonte, séries e data de cada moeda.
+
+A raiz do site e `/index.html` abrem diretamente o laboratório com a barra de configurações. A mesa de câmbio permanece em `/editorial.html`; cotações globais em `/editorial.html#mercados`.
