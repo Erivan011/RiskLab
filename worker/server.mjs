@@ -131,7 +131,10 @@ export default {
     const path = url.pathname === "/" ? "/index.html" : url.pathname;
     const asset = ASSETS[path];
     if (!asset) return new Response("Não encontrado", { status: 404 });
-    return new Response(request.method === "HEAD" ? null : asset.body, {
+    const body = asset.encoding === "base64"
+      ? Uint8Array.from(atob(asset.body), character => character.charCodeAt(0))
+      : asset.body;
+    return new Response(request.method === "HEAD" ? null : body, {
       headers: {
         "content-type": asset.type,
         "cache-control": "no-cache",

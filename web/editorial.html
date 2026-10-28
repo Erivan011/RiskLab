@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RiskLab Trade — O caixa aguenta?</title>
+<meta name="description" content="Uma investigação interativa sobre câmbio, pagamentos e liquidez. Explore uma carteira demonstrativa brasileira com referências do Banco Central.">
+<meta property="og:title" content="Se o dólar subir 10%, o caixa aguenta?">
+<meta property="og:description" content="Mova o câmbio. Investigue a queda do caixa. Compare três hipóteses de proteção.">
+<meta property="og:type" content="website"><meta property="og:image" content="https://risklab-erivan.citrusjoy10.chatgpt.site/editorial-share.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="627">
+<meta name="twitter:card" content="summary_large_image"><meta name="theme-color" content="#f6f3ec">
+<style>
+:root{--paper:#f6f3ec;--ink:#252722;--muted:#696c62;--line:#d3d0c5;--risk:#a34d32;--soft:#e8e3d8;--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace;--serif:Georgia,'Times New Roman',serif}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.6 Arial,sans-serif;font-variant-numeric:tabular-nums}a{color:inherit;text-underline-offset:4px}button,input{font:inherit}button,a,input,summary{touch-action:manipulation}button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--risk);outline-offset:5px}.skip{position:absolute;top:-80px;background:var(--paper);padding:10px}.skip:focus{top:0}main,.folio,footer{max-width:1232px;margin:auto;padding-inline:36px}.folio{display:flex;align-items:center;justify-content:space-between;padding-block:28px 22px;border-bottom:1px solid var(--ink);gap:20px}.wordmark{font:27px var(--serif);letter-spacing:-1px;text-decoration:none}.wordmark small{font:9px var(--mono);letter-spacing:1.7px;margin-left:12px}.folio nav{display:flex;gap:24px;font-size:11px}.folio nav a{text-decoration:none;color:var(--muted)}.edition{font:10px var(--mono);color:var(--muted)}.eyebrow{font:10px/1.5 var(--mono);letter-spacing:1.2px;color:var(--muted);text-transform:uppercase}.opening{padding-top:30px}.opening-top{display:flex;justify-content:space-between;gap:20px;margin-bottom:30px}.opening-top>span{font:10px var(--mono);color:var(--muted)}.lead-grid{display:grid;grid-template-columns:310px minmax(0,1fr);gap:46px;align-items:start}.lead h1{font:clamp(37px,3.9vw,56px)/1.08 var(--serif);font-weight:400;letter-spacing:-2.1px;margin:14px 0 22px;max-width:330px}.lead h1 em{font-style:normal;color:var(--risk)}.lead>p{font-size:13px;color:var(--muted);max-width:280px;line-height:1.85}.answer{border-left:2px solid var(--risk);padding-left:16px;margin-top:30px}.answer>span{font:9px var(--mono);color:var(--muted);letter-spacing:.5px}.answer strong{display:block;font:31px/1.5 var(--mono);letter-spacing:-1.8px;color:var(--risk);margin:4px 0}.answer p{font-size:11px;line-height:1.7;margin:0;color:var(--muted);max-width:270px}.answer p b{color:var(--ink);font-weight:400}.chart-top{display:flex;align-items:center;justify-content:space-between;gap:24px;border-block:1px solid var(--line);padding:17px 0}.chart-top>div{font-size:11px}.chart-top b{font-size:11px;font-weight:500}.chart-top small{display:block;color:var(--muted);font:9px var(--mono);margin-top:3px}.shock-control{display:flex;align-items:center;gap:12px;flex:1;max-width:340px}.shock-control label{font:10px var(--mono);white-space:nowrap}.shock-control input{width:100%;min-width:40px;accent-color:var(--risk);cursor:pointer}.shock-control output{font:16px var(--mono);min-width:46px;text-align:right;color:var(--risk)}.plot-wrap{min-width:0;padding-top:14px}.main-plot{width:100%;height:auto;display:block;overflow:visible}.plot-foot{display:flex;justify-content:space-between;gap:20px;padding:13px 0;border-top:1px solid var(--line);font:9px/1.7 var(--mono);color:var(--muted)}.plot-foot b{font-weight:400;color:var(--risk)}.source-line{display:flex;align-items:center;gap:24px;border-block:1px solid var(--line);margin-top:36px;padding:16px 0;font:10px var(--mono);color:var(--muted)}.source-line b{color:var(--ink);font-weight:500}.source-line>span:last-child{margin-left:auto}.section{border-top:1px solid var(--ink);margin-top:72px;padding-top:21px}.section-heading{display:flex;justify-content:space-between;align-items:start;gap:30px;margin-bottom:24px}.section-heading>div{max-width:700px}.section h2{font:34px/1.2 var(--serif);letter-spacing:-.9px;font-weight:400;margin:10px 0 13px}.section-heading p{font-size:13px;color:var(--muted);max-width:600px;margin:0;line-height:1.8}.section-index{font:48px var(--serif);color:#b5b2a6;line-height:1}.cause-grid{display:grid;grid-template-columns:minmax(0,1.65fr) 1fr;gap:42px}.waterfall{width:100%;height:auto;display:block}.cause-aside{border-left:1px solid var(--line);padding-left:26px}.cause-aside h3{font:19px var(--serif);margin:6px 0 16px}.cause-aside .delta{font:28px var(--mono);letter-spacing:-1.1px;color:var(--risk)}.cause-aside>p{font-size:12px;color:var(--muted);line-height:1.8}.drivers{margin-top:20px}.driver{display:grid;grid-template-columns:1fr auto;gap:10px;padding:12px 0;border-top:1px solid var(--line)}.driver span{font-size:11px}.driver small{display:block;font:9px var(--mono);color:var(--muted);margin-top:4px}.driver b{font:11px var(--mono);font-weight:400}.figure-note{font-size:10px;color:var(--muted);line-height:1.8;margin:12px 0}.heatmap-details{margin-top:30px;border-block:1px solid var(--line);padding-block:14px}summary{cursor:pointer;font-size:12px;list-style-position:outside;margin-left:16px}summary::marker{font-size:10px;color:var(--muted)}.heatmap-scroll{overflow-x:auto;margin-top:20px}.heatmap{display:grid;grid-template-columns:48px repeat(13,minmax(36px,1fr));gap:3px;min-width:580px;font:9px var(--mono)}.heatmap>span{display:grid;place-items:center;min-height:34px}.heatmap .currency{text-align:left;justify-content:start}.heatmap .week{min-height:28px;color:var(--muted);font-size:8px}.heatmap .cell{background:rgba(55,58,51,var(--shade));position:relative}.heatmap .cell:hover:after,.heatmap .cell:focus:after{content:attr(data-label);position:absolute;bottom:100%;left:0;padding:7px;background:var(--ink);color:var(--paper);z-index:2;white-space:nowrap}.heatmap small{font-size:8px;color:var(--muted)}.hedge-table{width:100%;border-collapse:collapse;table-layout:fixed;margin-top:20px}.hedge-table th{font:9px/1.7 var(--mono);letter-spacing:.5px;text-transform:uppercase;color:var(--muted);text-align:right;padding:14px 15px;border-bottom:1px solid var(--line)}.hedge-table th:first-child{text-align:left;padding-left:0;width:24%}.hedge-table td{text-align:right;padding:23px 15px;border-bottom:1px solid var(--line);font:14px var(--mono);vertical-align:middle}.hedge-table td:first-child{text-align:left;font:28px var(--serif);padding-left:0}.hedge-table td small{display:block;font:9px Arial,sans-serif;color:var(--muted);margin-top:6px}.hedge-table .risk-number{color:var(--risk)}.mini-range{display:block;width:90px;height:13px;margin:10px 0 0 auto}.hedge-note{padding:17px 0;font-size:11px;color:var(--muted);line-height:1.9;max-width:850px}.method-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px}.method-grid details{border-bottom:1px solid var(--line);padding:16px 0}.method-grid summary{font-size:12px}.method-grid p,.method-grid li{font-size:12px;color:var(--muted);line-height:1.8}.method-grid code{font-size:10px}.method-grid ul{padding-left:20px}.method-grid a{font-size:12px}.method-caption{font:12px/1.8 var(--mono);color:var(--muted);max-width:400px}.method-actions{display:flex;gap:15px;flex-wrap:wrap;margin-top:24px}.method-actions button,.method-actions a{background:none;border:1px solid var(--line);padding:10px 14px;text-decoration:none;font-size:11px;color:var(--ink);cursor:pointer}.method-actions a{border:0;border-bottom:1px solid var(--ink);padding-inline:0}.method-log{font-size:11px;color:var(--muted);margin-top:12px}footer{display:flex;justify-content:space-between;gap:25px;border-top:1px solid var(--ink);margin-top:70px;padding-block:22px 30px;font:10px/1.7 var(--mono);color:var(--muted)}footer a{font-size:10px}.fallback-notice{display:block;font-size:11px;color:var(--muted);margin:10px 0}.js-ready .fallback-notice{display:none}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}.skeleton{background:linear-gradient(90deg,#e5e1d6,#eeeae1,#e5e1d6);height:240px}.mobile-return{display:none}
+@media(max-width:950px){.lead-grid{grid-template-columns:260px minmax(0,1fr);gap:25px}.lead h1{font-size:44px}.shock-control{max-width:250px}.shock-control label{display:none}.chart-top{gap:15px}.source-line{gap:16px}.source-line>span:last-child{font-size:8px}.folio nav{gap:15px}.cause-grid{gap:25px;grid-template-columns:1.4fr 1fr}.hedge-table th{font-size:8px}.hedge-table td{font-size:12px;padding-inline:8px}.wordmark small{display:none}}
+@media(max-width:700px){main,.folio,footer{padding-inline:20px}.folio{padding-block:20px 16px;gap:15px}.wordmark{font-size:26px}.folio nav{gap:14px}.folio nav a{font-size:10px}.folio nav a:nth-child(2),.folio nav a:nth-child(3){display:none}.edition{display:none}.opening{padding-top:20px}.opening-top{margin-bottom:15px}.opening-top>span{font-size:8px}.eyebrow{font-size:9px;letter-spacing:.7px}.lead-grid{grid-template-columns:1fr;gap:25px}.lead h1{font-size:46px;max-width:450px;letter-spacing:-1.7px;margin:5px 0 14px}.lead>p{font-size:12px;max-width:390px;line-height:1.7}.lead>p br{display:none}.answer{margin-top:19px;display:grid;grid-template-columns:1fr 1fr;column-gap:15px;align-items:center;padding-left:12px}.answer>span{grid-column:1}.answer strong{font-size:25px;letter-spacing:-1px;grid-column:1;margin:3px 0}.answer p{grid-column:2;grid-row:1/3;font-size:10px}.chart-top{padding:13px 0;gap:14px}.chart-top b{font-size:10px}.chart-top small{font-size:8px}.shock-control{max-width:210px;gap:8px}.shock-control output{font-size:15px;min-width:43px}.plot-wrap{margin-inline:-7px;padding-top:8px}.plot-foot{font-size:8px;gap:10px}.source-line{flex-wrap:wrap;gap:8px 16px;margin-top:20px;padding-block:12px;font-size:9px}.source-line>span:last-child{margin-left:0;width:100%;font-size:8px}.section{margin-top:48px;padding-top:18px}.section h2{font-size:31px;margin-top:8px}.section-heading{gap:15px;margin-bottom:18px}.section-heading p{font-size:12px}.section-index{font-size:36px}.cause-grid{grid-template-columns:1fr;gap:22px}.cause-aside{border-left:0;border-top:1px solid var(--line);padding:20px 0 0}.cause-aside h3{font-size:21px}.cause-aside .delta{font-size:25px}.drivers{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}.driver{display:block}.driver b{display:block;margin-top:8px}.figure-note{font-size:9px}.heatmap-details{margin-top:18px}.hedge-table th{font-size:7px;padding:12px 4px;letter-spacing:0}.hedge-table th:first-child{width:19%}.hedge-table td{font-size:10px;padding:18px 4px}.hedge-table td:first-child{font-size:25px}.hedge-table td small{font-size:8px;line-height:1.5}.mini-range{width:65px}.hedge-note{font-size:10px}.method-grid{grid-template-columns:1fr;gap:10px}.method-caption{font-size:11px}.method-grid summary{font-size:11px}.method-actions{gap:12px}.method-actions button,.method-actions a{font-size:10px}footer{margin-top:45px;font-size:8px}.mobile-return{display:block}}
+@media(max-width:700px){#profile{height:215px}#profile text{font-size:19px}.waterfall text{font-size:13px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{.shock-control,.folio nav,.method-actions{display:none}body{background:white}.lead-grid{grid-template-columns:260px 1fr}.section{break-inside:avoid;margin-top:30px}.main-plot{max-height:300px}.opening-top{margin-bottom:10px}footer{margin-top:30px}}
+</style>
+</head>
+<body>
+<a class="skip" href="#situacao">Ir para o estudo</a>
+<header class="folio"><a class="wordmark" href="#situacao">RiskLab<span aria-hidden="true">.</span><small>TRADE RESEARCH</small></a><nav aria-label="Seções do estudo"><a href="#situacao">Situação</a><a href="#causas">Causas</a><a href="#protecao">Proteção</a><a href="#metodo">Método ↗</a></nav><span class="edition">ESTUDO 01 / OUT 2026</span></header>
+<main>
+<section class="opening" id="situacao" aria-labelledby="question"><div class="opening-top"><span class="eyebrow">CÂMBIO & LIQUIDEZ / CARTEIRA DEMONSTRATIVA</span><span>UMA IMPORTADORA BRASILEIRA</span></div><div class="lead-grid"><div class="lead"><h1 id="question">Se o dólar subir <em><span id="question-shock">10</span>%</em>,<br>o caixa aguenta?</h1><p>O custo muda no câmbio.<br> O problema aparece no vencimento.<br> Explore 90 dias da Aurora Componentes.</p><div class="answer" aria-live="polite" aria-atomic="true"><span>NECESSIDADE ADICIONAL DE CAIXA</span><strong id="funding">R$ 56.641</strong><p id="answer-text">O saldo fica negativo em <b>18 de dez</b>. A base já precisa de R$ 31.887.</p></div></div><div class="plot-column"><div class="chart-top"><div><b>Trajetória do caixa</b><small>90 DIAS / R$ MIL</small></div><div class="shock-control"><label for="usd-shock">CHOQUE USD</label><input id="usd-shock" type="range" min="0" max="20" step="1" value="10" aria-label="Alta do dólar em porcentagem" aria-describedby="slider-note"><output for="usd-shock" id="shock-output">+10%</output></div></div><div class="plot-wrap"><svg class="main-plot" id="profile" viewBox="0 0 760 345" role="img" aria-label="Projeção de caixa em 90 dias. Dólar mais 10%. Aporte mínimo R$ 56.641. Primeiro déficit 2026-12-18."><rect x="53" y="208.29981322080448" width="647" height="72.70018677919552" fill="#a34d32" opacity=".045"/><line x1="53" x2="700" y1="258.27868852459017" y2="258.27868852459017" stroke="#dedad0"/><text x="39" y="262.27868852459017" text-anchor="end" font-family="monospace" font-size="10" fill="#76786d">-81</text><line x1="53" x2="700" y1="189.4262295081967" y2="189.4262295081967" stroke="#dedad0"/><text x="39" y="193.4262295081967" text-anchor="end" font-family="monospace" font-size="10" fill="#76786d">31</text><line x1="53" x2="700" y1="120.57377049180329" y2="120.57377049180329" stroke="#dedad0"/><text x="39" y="124.57377049180329" text-anchor="end" font-family="monospace" font-size="10" fill="#76786d">143</text><line x1="53" x2="700" y1="51.721311475409834" y2="51.721311475409834" stroke="#dedad0"/><text x="39" y="55.721311475409834" text-anchor="end" font-family="monospace" font-size="10" fill="#76786d">255</text><line x1="53" x2="700" y1="208.29981322080448" y2="208.29981322080448" stroke="#9c9c8d" stroke-dasharray="2 4"/><text x="709" y="212.29981322080448" fill="#77796c" font-family="monospace" font-size="9">zero</text><path d="M53,51.7 H53.0V76.1 H74.6V92.9 H103.3V99.4 H117.7V80.8 H124.9V111.0 H132.1V118.7 H146.5V127.1 H153.6V136.4 H160.8V145.4 H175.2V156.1 H211.2V175.0 H225.5V151.7 H275.9V164.4 H326.2V190.3 H333.4V162.7 H376.5V174.0 H405.3V185.4 H419.6V197.5 H426.8V208.6 H434.0V219.9 H441.2V201.5 H448.4V213.6 H556.2V192.1 H577.8V214.1 H664.1V227.9 H700.0V227.9" stroke="#999c8d" stroke-width="1.6" fill="none"/><path d="M53,51.7 H53.0V78.4 H74.6V95.2 H103.3V102.4 H117.7V84.2 H124.9V116.4 H132.1V124.5 H146.5V133.7 H153.6V143.0 H160.8V152.6 H175.2V163.3 H211.2V182.8 H225.5V159.4 H275.9V172.2 H326.2V200.5 H333.4V172.9 H376.5V184.2 H405.3V195.6 H419.6V207.7 H426.8V218.7 H434.0V230.6 H441.2V212.2 H448.4V225.5 H556.2V204.0 H577.8V228.0 H664.1V243.1 H700.0V243.1" stroke="#a34d32" stroke-width="2.6" fill="none"/><text x="697" y="216.87933469039248" text-anchor="end" font-family="monospace" font-size="10" fill="#7a7d6e">base</text><text x="697" y="262.07902388815813" text-anchor="end" font-family="monospace" font-size="10" fill="#a34d32">USD +10%</text><line x1="426.8222222222222" x2="426.8222222222222" y1="30" y2="218.73247300309828" stroke="#a34d32" stroke-opacity=".4" stroke-dasharray="2 4"/><circle cx="426.8222222222222" cy="218.73247300309828" r="4" fill="#a34d32"/><text x="356.8222222222222" y="17" font-family="monospace" font-size="10" fill="#a34d32">18 de dez: saldo negativo</text><text x="53" y="333" text-anchor="start" font-family="monospace" font-size="10" fill="#727568">27 de out</text><text x="268.66666666666663" y="333" text-anchor="middle" font-family="monospace" font-size="10" fill="#727568">26 de nov</text><text x="484.3333333333333" y="333" text-anchor="middle" font-family="monospace" font-size="10" fill="#727568">26 de dez</text><text x="700" y="333" text-anchor="end" font-family="monospace" font-size="10" fill="#727568">25 de jan</text></svg></div><div class="plot-foot"><span id="slider-note">Mova o dólar. Euro e libra ficam constantes.</span><span id="delta">vs. base <b>+R$ 24.754</b> de aporte</span></div><p class="fallback-notice" id="fallback-notice">Estado estático: dólar +10%. Os controles ficam disponíveis com JavaScript.</p></div></div><div class="source-line"><span>USD <b id="usd-ref">5,5007</b></span><span>CAIXA INICIAL <b>R$ 255 mil</b></span><span><b>21</b> COMPROMISSOS ABERTOS</span><span>BCB/SGS · snapshot 26/10/2026 · base 27/10/2026</span></div></section>
+<section class="section" id="causas"><header class="section-heading"><div><span class="eyebrow">O QUE EXPLICA</span><h2>O caixa cai. Os pagamentos têm nome.</h2><p>Da disponibilidade inicial ao saldo final, acompanhe os fluxos que formam a projeção. A queda deixa de ser uma linha abstrata.</p></div><span class="section-index" aria-hidden="true">02</span></header><div class="cause-grid"><div><svg id="waterfall" class="waterfall" viewBox="0 0 710 315" role="img" aria-label="Ponte de caixa: abertura, recebimentos, pagamentos por fornecedor e saldo final"><line x1="14" x2="697" y1="217.9824135642612" y2="217.9824135642612" stroke="#c3c3b4"/><rect x="19" y="118.8576597240666" width="68" height="99.12475384019461" fill="#444a3d"/><text x="53" y="109.8576597240666" text-anchor="middle" font-family="monospace" font-size="10" fill="#53594a">255 mil</text><text x="53" y="281" text-anchor="middle" font-family="Arial" font-size="9" fill="#747869"><tspan x="53">Caixa inicial</tspan><tspan x="53" dy="13"></tspan></text><line x1="87" x2="104" y1="118.8576597240666" y2="118.8576597240666" stroke="#aeb3a0" stroke-dasharray="2 3"/><rect x="104" y="45" width="68" height="73.8576597240666" fill="#b8b9ab"/><text x="138" y="36" text-anchor="middle" font-family="monospace" font-size="10" fill="#53594a">+190 mil</text><text x="138" y="281" text-anchor="middle" font-family="Arial" font-size="9" fill="#747869"><tspan x="138">Recebimentos</tspan><tspan x="138" dy="13"></tspan></text><line x1="172" x2="189" y1="45" y2="45" stroke="#aeb3a0" stroke-dasharray="2 3"/><rect x="189" y="45" width="68" height="35.606886595839455" fill="#b8b9ab"/><text x="223" y="96.60688659583946" text-anchor="middle" font-family="monospace" font-size="10" fill="#53594a">-92 mil</text><text x="223" y="281" text-anchor="middle" font-family="Arial" font-size="9" fill="#747869"><tspan x="223">Han River</tspan><tspan x="223" dy="13">Components</tspan></text><line x1="257" x2="274" y1="80.60688659583946" y2="80.60688659583946" stroke="#aeb3a0" stroke-dasharray="2 3"/><rect x="274" y="80.60688659583946" width="68" height="29.244325205023785" fill="#b8b9ab"/><text x="308" y="125.85121180086324" text-anchor="middle" font-family="monospace" font-size="10" fill="#53594a">-75 mil</text><text x="308" y="281" text-anchor="middle" font-family="Arial" font-size="9" fill="#747869"><tspan x="308">Kanto Electronics</tspan><tspan x="308" dy="13"></tspan></text><line x1="342" x2="359" y1="109.85121180086324" y2="109.85121180086324" stroke="#aeb3a0" stroke-dasharray="2 3"/><rect x="359" y="109.85121180086324" width="68" height="27.505552630818812" fill="#b8b9ab"/><text x="393" y="153.35676443168205" text-anchor="middle" font-family="monospace" font-size="10" fill="#53594a">-71 mil</text><text x="393" y="281" text-anchor="middle" font-family="Arial" font-size="9" fill="#747869"><tspan x="393">Pacific Circuit</tspan><tspan x="393" dy="13">Supply</tspan></text><line x1="427" x2="444" y1="137.35676443168205" y2="137.35676443168205" stroke="#aeb3a0" stroke-dasharray="2 3"/><rect x="444" y="137.35676443168205" width="68" height="17.78813921337587" fill="#b8b9ab"/><text x="478" y="171.14490364505792" text-anchor="middle" font-family="monospace" font-size="10" fill="#53594a">-46 mil</text><text x="478" y="281" text-anchor="middle" font-family="Arial" font-size="9" fill="#747869"><tspan x="478">Nordwerk Technik</tspan><tspan x="478" dy="13"></tspan></text><line x1="512" x2="529" y1="155.14490364505792" y2="155.14490364505792" stroke="#aeb3a0" stroke-dasharray="2 3"/><rect x="529" y="155.14490364505792" width="68" height="84.85509635494208" fill="#b8b9ab"/><text x="563" y="256" text-anchor="middle" font-family="monospace" font-size="10" fill="#53594a">-218 mil</text><text x="563" y="281" text-anchor="middle" font-family="Arial" font-size="9" fill="#747869"><tspan x="563">Outros</tspan><tspan x="563" dy="13"></tspan></text><line x1="597" x2="614" y1="240" y2="240" stroke="#aeb3a0" stroke-dasharray="2 3"/><rect x="614" y="217.9824135642612" width="68" height="22.017586435738792" fill="#a34d32"/><text x="648" y="256" text-anchor="middle" font-family="monospace" font-size="10" fill="#a34d32">-57 mil</text><text x="648" y="281" text-anchor="middle" font-family="Arial" font-size="9" fill="#747869"><tspan x="648">Saldo final</tspan><tspan x="648" dy="13"></tspan></text></svg><p class="figure-note">Valores agregados no horizonte. A ordem das barras não é cronológica. “Outros” reúne os fornecedores restantes. O déficit máximo pode ocorrer antes do saldo final.</p></div><aside class="cause-aside"><span class="eyebrow">EFEITO DO DÓLAR NO CUSTO</span><h3>Quanto muda contra a base?</h3><div class="delta" id="cost-delta">+R$ 24.754</div><p>Variação dos pagamentos em aberto sob o choque selecionado, mantendo as taxas fixas já informadas.</p><div id="drivers" class="drivers"><div class="driver"><span>Pacific Circuit Supply<small>IMP-26058 / 04 de dez</small></span><b>+R$ 3.961</b></div><div class="driver"><span>Kanto Electronics<small>IMP-26041 / 23 de out</small></span><b>+R$ 3.740</b></div><div class="driver"><span>Han River Components<small>IMP-26067 / 08 de jan</small></span><b>+R$ 3.355</b></div></div></aside></div><details class="heatmap-details"><summary>Investigar concentração dos vencimentos por semana e moeda</summary><p class="figure-note">Intensidade proporcional ao valor dos pagamentos em reais. Vencidos entram na data-base. Use o foco ou o toque para consultar cada célula.</p><div class="heatmap-scroll"><div id="maturity-heatmap" class="heatmap"><span></span><span class="week" title="A partir de 2026-10-27">S01</span><span class="week" title="A partir de 2026-11-03">S02</span><span class="week" title="A partir de 2026-11-10">S03</span><span class="week" title="A partir de 2026-11-17">S04</span><span class="week" title="A partir de 2026-11-24">S05</span><span class="week" title="A partir de 2026-12-01">S06</span><span class="week" title="A partir de 2026-12-08">S07</span><span class="week" title="A partir de 2026-12-15">S08</span><span class="week" title="A partir de 2026-12-22">S09</span><span class="week" title="A partir de 2026-12-29">S10</span><span class="week" title="A partir de 2027-01-05">S11</span><span class="week" title="A partir de 2027-01-12">S12</span><span class="week" title="A partir de 2027-01-19">S13</span><span class="currency">USD</span><span class="cell" tabindex="0" title="USD, semana 1: R$ 43.445" aria-label="USD, semana 1: R$ 43.445" data-label="USD, semana 1: R$ 43.445" style="--shade:0.286416676703215"><span class="sr-only">USD, semana 1: R$ 43.445</span></span><span class="cell" tabindex="0" title="USD, semana 2: R$ 104.701" aria-label="USD, semana 2: R$ 104.701" data-label="USD, semana 2: R$ 104.701" style="--shade:0.655"><span class="sr-only">USD, semana 2: R$ 104.701</span></span><span class="cell" tabindex="0" title="USD, semana 3: R$ 15.638" aria-label="USD, semana 3: R$ 15.638" data-label="USD, semana 3: R$ 15.638" style="--shade:0.11909438067588296"><span class="sr-only">USD, semana 3: R$ 15.638</span></span><span class="cell" tabindex="0" title="USD, semana 4: R$ 31.786" aria-label="USD, semana 4: R$ 31.786" data-label="USD, semana 4: R$ 31.786" style="--shade:0.2162627445459518"><span class="sr-only">USD, semana 4: R$ 31.786</span></span><span class="cell" tabindex="0" title="USD, semana 5: R$ 0" aria-label="USD, semana 5: R$ 0" data-label="USD, semana 5: R$ 0" style="--shade:0.025"><span class="sr-only">USD, semana 5: R$ 0</span></span><span class="cell" tabindex="0" title="USD, semana 6: R$ 46.166" aria-label="USD, semana 6: R$ 46.166" data-label="USD, semana 6: R$ 46.166" style="--shade:0.30278513929280493"><span class="sr-only">USD, semana 6: R$ 46.166</span></span><span class="cell" tabindex="0" title="USD, semana 7: R$ 0" aria-label="USD, semana 7: R$ 0" data-label="USD, semana 7: R$ 0" style="--shade:0.025"><span class="sr-only">USD, semana 7: R$ 0</span></span><span class="cell" tabindex="0" title="USD, semana 8: R$ 40.948" aria-label="USD, semana 8: R$ 40.948" data-label="USD, semana 8: R$ 40.948" style="--shade:0.27138787316260726"><span class="sr-only">USD, semana 8: R$ 40.948</span></span><span class="cell" tabindex="0" title="USD, semana 9: R$ 0" aria-label="USD, semana 9: R$ 0" data-label="USD, semana 9: R$ 0" style="--shade:0.025"><span class="sr-only">USD, semana 9: R$ 0</span></span><span class="cell" tabindex="0" title="USD, semana 10: R$ 0" aria-label="USD, semana 10: R$ 0" data-label="USD, semana 10: R$ 0" style="--shade:0.025"><span class="sr-only">USD, semana 10: R$ 0</span></span><span class="cell" tabindex="0" title="USD, semana 11: R$ 39.110" aria-label="USD, semana 11: R$ 39.110" data-label="USD, semana 11: R$ 39.110" style="--shade:0.260329067139685"><span class="sr-only">USD, semana 11: R$ 39.110</span></span><span class="cell" tabindex="0" title="USD, semana 12: R$ 0" aria-label="USD, semana 12: R$ 0" data-label="USD, semana 12: R$ 0" style="--shade:0.025"><span class="sr-only">USD, semana 12: R$ 0</span></span><span class="cell" tabindex="0" title="USD, semana 13: R$ 24.593" aria-label="USD, semana 13: R$ 24.593" data-label="USD, semana 13: R$ 24.593" style="--shade:0.17297943413351605"><span class="sr-only">USD, semana 13: R$ 24.593</span></span><span class="currency">EUR</span><span class="cell" tabindex="0" title="EUR, semana 1: R$ 27.320" aria-label="EUR, semana 1: R$ 27.320" data-label="EUR, semana 1: R$ 27.320" style="--shade:0.1893902574835481"><span class="sr-only">EUR, semana 1: R$ 27.320</span></span><span class="cell" tabindex="0" title="EUR, semana 2: R$ 0" aria-label="EUR, semana 2: R$ 0" data-label="EUR, semana 2: R$ 0" style="--shade:0.025"><span class="sr-only">EUR, semana 2: R$ 0</span></span><span class="cell" tabindex="0" title="EUR, semana 3: R$ 17.341" aria-label="EUR, semana 3: R$ 17.341" data-label="EUR, semana 3: R$ 17.341" style="--shade:0.12934201423925942"><span class="sr-only">EUR, semana 3: R$ 17.341</span></span><span class="cell" tabindex="0" title="EUR, semana 4: R$ 0" aria-label="EUR, semana 4: R$ 0" data-label="EUR, semana 4: R$ 0" style="--shade:0.025"><span class="sr-only">EUR, semana 4: R$ 0</span></span><span class="cell" tabindex="0" title="EUR, semana 5: R$ 20.711" aria-label="EUR, semana 5: R$ 20.711" data-label="EUR, semana 5: R$ 20.711" style="--shade:0.1496210850417672"><span class="sr-only">EUR, semana 5: R$ 20.711</span></span><span class="cell" tabindex="0" title="EUR, semana 6: R$ 0" aria-label="EUR, semana 6: R$ 0" data-label="EUR, semana 6: R$ 0" style="--shade:0.025"><span class="sr-only">EUR, semana 6: R$ 0</span></span><span class="cell" tabindex="0" title="EUR, semana 7: R$ 18.440" aria-label="EUR, semana 7: R$ 18.440" data-label="EUR, semana 7: R$ 18.440" style="--shade:0.13595631002170283"><span class="sr-only">EUR, semana 7: R$ 18.440</span></span><span class="cell" tabindex="0" title="EUR, semana 8: R$ 38.234" aria-label="EUR, semana 8: R$ 38.234" data-label="EUR, semana 8: R$ 38.234" style="--shade:0.2550596653297443"><span class="sr-only">EUR, semana 8: R$ 38.234</span></span><span class="cell" tabindex="0" title="EUR, semana 9: R$ 0" aria-label="EUR, semana 9: R$ 0" data-label="EUR, semana 9: R$ 0" style="--shade:0.025"><span class="sr-only">EUR, semana 9: R$ 0</span></span><span class="cell" tabindex="0" title="EUR, semana 10: R$ 0" aria-label="EUR, semana 10: R$ 0" data-label="EUR, semana 10: R$ 0" style="--shade:0.025"><span class="sr-only">EUR, semana 10: R$ 0</span></span><span class="cell" tabindex="0" title="EUR, semana 11: R$ 0" aria-label="EUR, semana 11: R$ 0" data-label="EUR, semana 11: R$ 0" style="--shade:0.025"><span class="sr-only">EUR, semana 11: R$ 0</span></span><span class="cell" tabindex="0" title="EUR, semana 12: R$ 0" aria-label="EUR, semana 12: R$ 0" data-label="EUR, semana 12: R$ 0" style="--shade:0.025"><span class="sr-only">EUR, semana 12: R$ 0</span></span><span class="cell" tabindex="0" title="EUR, semana 13: R$ 0" aria-label="EUR, semana 13: R$ 0" data-label="EUR, semana 13: R$ 0" style="--shade:0.025"><span class="sr-only">EUR, semana 13: R$ 0</span></span><span class="currency">GBP</span><span class="cell" tabindex="0" title="GBP, semana 1: R$ 0" aria-label="GBP, semana 1: R$ 0" data-label="GBP, semana 1: R$ 0" style="--shade:0.025"><span class="sr-only">GBP, semana 1: R$ 0</span></span><span class="cell" tabindex="0" title="GBP, semana 2: R$ 0" aria-label="GBP, semana 2: R$ 0" data-label="GBP, semana 2: R$ 0" style="--shade:0.025"><span class="sr-only">GBP, semana 2: R$ 0</span></span><span class="cell" tabindex="0" title="GBP, semana 3: R$ 15.200" aria-label="GBP, semana 3: R$ 15.200" data-label="GBP, semana 3: R$ 15.200" style="--shade:0.11646295911955482"><span class="sr-only">GBP, semana 3: R$ 15.200</span></span><span class="cell" tabindex="0" title="GBP, semana 4: R$ 0" aria-label="GBP, semana 4: R$ 0" data-label="GBP, semana 4: R$ 0" style="--shade:0.025"><span class="sr-only">GBP, semana 4: R$ 0</span></span><span class="cell" tabindex="0" title="GBP, semana 5: R$ 0" aria-label="GBP, semana 5: R$ 0" data-label="GBP, semana 5: R$ 0" style="--shade:0.025"><span class="sr-only">GBP, semana 5: R$ 0</span></span><span class="cell" tabindex="0" title="GBP, semana 6: R$ 0" aria-label="GBP, semana 6: R$ 0" data-label="GBP, semana 6: R$ 0" style="--shade:0.025"><span class="sr-only">GBP, semana 6: R$ 0</span></span><span class="cell" tabindex="0" title="GBP, semana 7: R$ 0" aria-label="GBP, semana 7: R$ 0" data-label="GBP, semana 7: R$ 0" style="--shade:0.025"><span class="sr-only">GBP, semana 7: R$ 0</span></span><span class="cell" tabindex="0" title="GBP, semana 8: R$ 18.009" aria-label="GBP, semana 8: R$ 18.009" data-label="GBP, semana 8: R$ 18.009" style="--shade:0.13336081087160187"><span class="sr-only">GBP, semana 8: R$ 18.009</span></span><span class="cell" tabindex="0" title="GBP, semana 9: R$ 0" aria-label="GBP, semana 9: R$ 0" data-label="GBP, semana 9: R$ 0" style="--shade:0.025"><span class="sr-only">GBP, semana 9: R$ 0</span></span><span class="cell" tabindex="0" title="GBP, semana 10: R$ 0" aria-label="GBP, semana 10: R$ 0" data-label="GBP, semana 10: R$ 0" style="--shade:0.025"><span class="sr-only">GBP, semana 10: R$ 0</span></span><span class="cell" tabindex="0" title="GBP, semana 11: R$ 0" aria-label="GBP, semana 11: R$ 0" data-label="GBP, semana 11: R$ 0" style="--shade:0.025"><span class="sr-only">GBP, semana 11: R$ 0</span></span><span class="cell" tabindex="0" title="GBP, semana 12: R$ 0" aria-label="GBP, semana 12: R$ 0" data-label="GBP, semana 12: R$ 0" style="--shade:0.025"><span class="sr-only">GBP, semana 12: R$ 0</span></span><span class="cell" tabindex="0" title="GBP, semana 13: R$ 0" aria-label="GBP, semana 13: R$ 0" data-label="GBP, semana 13: R$ 0" style="--shade:0.025"><span class="sr-only">GBP, semana 13: R$ 0</span></span></div></div></details></section>
+<section class="section" id="protecao"><header class="section-heading"><div><span class="eyebrow">O QUE FAZER / HIPÓTESES, NÃO RECOMENDAÇÕES</span><h2>E se parte do dólar estivesse fixada?</h2><p>Três hipóteses sobre os contratos em USD, com taxa fixa igual à referência do snapshot. A comparação muda com o slider.</p></div><span class="section-index" aria-hidden="true">03</span></header><table class="hedge-table"><thead><tr><th scope="col">Parcela USD fixada</th><th scope="col">Custo total<br>da carteira</th><th scope="col">Efeito do choque<br>vs. sua base</th><th scope="col">Necessidade<br>adicional de caixa</th></tr></thead><tbody id="hedge-body"><tr><td>0%<small>fixação hipotética</small></td><td>R$ 509.369<svg class="mini-range" viewBox="0 0 90 14" role="img" aria-label="Sensibilidade do custo total a USD mais zero, dez e vinte por cento"><polyline points="5,11 45,6.499997031917767 85,2" fill="none" stroke="#777c6b" stroke-width="1.5"/></svg></td><td class="risk-number">+R$ 30.323<small>ao choque selecionado</small></td><td class="risk-number">R$ 64.369<small>mínimo no horizonte</small></td></tr><tr><td>50%<small>fixação hipotética</small></td><td>R$ 494.207<svg class="mini-range" viewBox="0 0 90 14" role="img" aria-label="Sensibilidade do custo total a USD mais zero, dez e vinte por cento"><polyline points="5,11 45,8.750000742020559 85,6.499997031917767" fill="none" stroke="#777c6b" stroke-width="1.5"/></svg></td><td class="risk-number">+R$ 15.161<small>ao choque selecionado</small></td><td class="risk-number">R$ 49.207<small>mínimo no horizonte</small></td></tr><tr><td>100%<small>fixação hipotética</small></td><td>R$ 479.046<svg class="mini-range" viewBox="0 0 90 14" role="img" aria-label="Sensibilidade do custo total a USD mais zero, dez e vinte por cento"><polyline points="5,11 45,11 85,11" fill="none" stroke="#777c6b" stroke-width="1.5"/></svg></td><td class="">+R$ 0<small>ao choque selecionado</small></td><td class="risk-number">R$ 34.046<small>mínimo no horizonte</small></td></tr></tbody></table><p class="hedge-note">É um teste de sensibilidade: aplica 0%, 50% ou 100% de cobertura aos contratos USD. EUR e GBP mantêm as condições originais. Não precifica spread, prêmio, margem, juros, NDF ou contratação real. Fixar o câmbio não elimina um déficit operacional.</p></section>
+<section class="section" id="metodo"><header class="section-heading"><div><span class="eyebrow">MÉTODO & DADOS</span><h2>Um resultado que você pode conferir.</h2></div><span class="section-index" aria-hidden="true">04</span></header><div class="method-grid"><div><p class="method-caption">Nenhum indicador sem premissa.<br>Nenhum cenário sem data.<br>Nenhuma demonstração vendida como previsão.</p><div class="method-actions"><button id="download-report">Baixar memória de cálculo ↓</button><a href="./">Abrir ambiente de operações ↗</a></div><p class="method-log" id="report-status" role="status"></p></div><div><details><summary>Carteira e recebimentos</summary><p>Empresa, fornecedores, contratos, taxas fixas e recebimentos são fictícios. O estudo usa a carteira demonstrativa original, sem dados salvos no seu navegador.</p><p id="receipt-summary">2026-11-05: R$ 42.000 · 2026-11-20: R$ 38.000 · 2026-12-05: R$ 45.000 · 2026-12-20: R$ 30.000 · 2027-01-05: R$ 35.000</p><p>Alterações, importação e exportação CSV, cenários salvos e trilha local ficam no <a href="./#operations">ambiente de operações</a>.</p></details><details><summary>Referências e cálculo</summary><p>Referências diárias BCB/SGS: USD série 1, EUR 21619 e GBP 21623. Este mockup fixa o snapshot de 26/10/2026 para manter as comparações reproduzíveis. Não é cotação em tempo real.</p><p>Principal protegido usa a taxa fixa informada; o restante recebe o choque USD. Custos locais ficam constantes. Arredondamento em centavos por operação, antes de agregar. Recebimentos e pagamentos são compensados por dia.</p></details><details><summary>O que significa necessidade de caixa?</summary><p><code>max(0, −menor saldo diário)</code>: aporte disponível desde a data-base para manter os saldos não negativos. Não é perda esperada, VaR, custo de crédito nem recomendação de financiamento. O cenário-base desta carteira já tem déficit.</p></details><details><summary>Sobre esta proposta visual</summary><p>Mockup editorial interativo do RiskLab Trade. Quatro atos, um gráfico protagonista e recursos operacionais recolhidos. Construído com HTML, CSS e JavaScript; usa o mesmo motor de caixa da aplicação.</p></details></div></div></section>
+</main><footer><span>RISKLAB TRADE / ERIVAN SANTOS MARQUES<br>Estudo demonstrativo de câmbio e liquidez.</span><span>Base: 27/10/2026 · BRL<br><a href="#situacao">Voltar à pergunta ↑</a></span></footer>
+<script type="module">
+const CURRENCIES = ["USD", "EUR", "GBP"];
+const cents = (value) => Math.round((value + Number.EPSILON) * 100);
+function validDate(value) {
+  return (
+    typeof value === "string" &&
+    /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    Number.isFinite(Date.parse(value + "T12:00:00Z")) &&
+    new Date(value + "T12:00:00Z").toISOString().slice(0, 10) === value
+  );
+}
+function addDays(date, days) {
+  const d = new Date(date + "T12:00:00Z");
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+function validateOperations(rows) {
+  if (!Array.isArray(rows) || !rows.length || rows.length > 500)
+    throw Error("A carteira deve conter entre 1 e 500 operações.");
+  const seen = new Set();
+  return rows.map((row, i) => {
+    const fail = (message) => {
+      throw Error(`Operação ${i + 1}: ${message}`);
+    };
+    if (
+      typeof row.id !== "string" ||
+      !/^[\w-]{1,30}$/.test(row.id) ||
+      seen.has(row.id)
+    )
+      fail("identificador ausente, inválido ou duplicado.");
+    seen.add(row.id);
+    if (
+      typeof row.supplier !== "string" ||
+      !row.supplier.trim() ||
+      row.supplier.length > 100
+    )
+      fail("informe um fornecedor de até 100 caracteres.");
+    if (!CURRENCIES.includes(row.currency))
+      fail("moeda deve ser USD, EUR ou GBP.");
+    if (!validDate(row.dueDate)) fail("vencimento inválido (AAAA-MM-DD).");
+    if (!Number.isFinite(row.amount) || row.amount <= 0 || row.amount > 1e8)
+      fail("valor em moeda deve ser positivo e até 100 milhões.");
+    if (
+      !Number.isFinite(row.budgetRate) ||
+      row.budgetRate <= 0 ||
+      row.budgetRate > 1000
+    )
+      fail("câmbio de orçamento inválido.");
+    if (
+      !Number.isFinite(row.localCostBrl) ||
+      row.localCostBrl < 0 ||
+      row.localCostBrl > 1e9
+    )
+      fail("custo local inválido.");
+    if (
+      !Number.isFinite(row.hedgePercent) ||
+      row.hedgePercent < 0 ||
+      row.hedgePercent > 100
+    )
+      fail("proteção deve estar entre 0 e 100%.");
+    if (
+      !Number.isFinite(row.hedgeRate) ||
+      row.hedgeRate <= 0 ||
+      row.hedgeRate > 1000
+    )
+      fail("taxa fixa inválida.");
+    if (!["open", "review", "paid"].includes(row.status))
+      fail("status deve ser open, review ou paid.");
+    return { ...row, supplier: row.supplier.trim() };
+  });
+}
+function priceOperation(
+  row,
+  rates,
+  shocks = { USD: 0, EUR: 0, GBP: 0 },
+) {
+  const rate = rates[row.currency],
+    shock = shocks[row.currency] ?? 0;
+  if (
+    !Number.isFinite(rate) ||
+    rate <= 0 ||
+    !Number.isFinite(shock) ||
+    shock <= -1 ||
+    shock > 1
+  )
+    throw Error("Referência cambial ou choque inválido.");
+  const coverage = row.hedgePercent / 100;
+  const baseForeign =
+    row.amount * (coverage * row.hedgeRate + (1 - coverage) * rate);
+  const scenarioForeign =
+    row.amount *
+    (coverage * row.hedgeRate + (1 - coverage) * rate * (1 + shock));
+  const baselineCents = cents(baseForeign + row.localCostBrl);
+  const scenarioCents = cents(scenarioForeign + row.localCostBrl);
+  const budgetCents = cents(row.amount * row.budgetRate + row.localCostBrl);
+  return {
+    ...row,
+    rate,
+    scenarioRate: rate * (1 + shock),
+    baselineCents,
+    scenarioCents,
+    budgetCents,
+    deviationCents: scenarioCents - budgetCents,
+    shockImpactCents: scenarioCents - baselineCents,
+    uncoveredBrl: row.amount * (1 - coverage) * rate,
+    protectedBrl: row.amount * coverage * rate,
+  };
+}
+function analyzeTrade({
+  operations,
+  rates,
+  shocks = { USD: 0, EUR: 0, GBP: 0 },
+  asOf,
+  openingCashBrl,
+  receipts = [],
+  horizon = 90,
+}) {
+  validateOperations(operations);
+  if (
+    !validDate(asOf) ||
+    !Number.isFinite(openingCashBrl) ||
+    openingCashBrl < 0 ||
+    !Number.isInteger(horizon) ||
+    horizon < 1 ||
+    horizon > 365
+  )
+    throw Error("Data-base, horizonte ou caixa inválido.");
+  for (const receipt of receipts)
+    if (
+      !validDate(receipt.date) ||
+      !Number.isFinite(receipt.amountBrl) ||
+      receipt.amountBrl < 0
+    )
+      throw Error("Recebimento projetado inválido.");
+  const rows = operations
+    .filter((r) => r.status !== "paid")
+    .map((r) => priceOperation(r, rates, shocks));
+  const total = (key, subset = rows) => subset.reduce((s, r) => s + r[key], 0);
+  const end = addDays(asOf, horizon);
+  const flows = new Map();
+  const flow = (date) => {
+    if (!flows.has(date))
+      flows.set(date, {
+        date,
+        inflowCents: 0,
+        baselineCents: 0,
+        scenarioCents: 0,
+      });
+    return flows.get(date);
+  };
+  flow(asOf);
+  flow(end);
+  for (const row of rows) {
+    const due = row.dueDate < asOf ? asOf : row.dueDate;
+    if (due <= end) {
+      const f = flow(due);
+      f.baselineCents += row.baselineCents;
+      f.scenarioCents += row.scenarioCents;
+    }
+  }
+  for (const receipt of receipts)
+    if (receipt.date >= asOf && receipt.date <= end)
+      flow(receipt.date).inflowCents += cents(receipt.amountBrl);
+  let base = cents(openingCashBrl),
+    scenario = base;
+  const cash = [...flows.values()]
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map((f) => {
+      base += f.inflowCents - f.baselineCents;
+      scenario += f.inflowCents - f.scenarioCents;
+      return { ...f, baseBalanceCents: base, scenarioBalanceCents: scenario };
+    });
+  const opening = cents(openingCashBrl);
+  const minimum = Math.min(opening, ...cash.map((f) => f.scenarioBalanceCents));
+  const firstShortfall =
+    cash.find((f) => f.scenarioBalanceCents < 0)?.date ?? null;
+  const currencies = CURRENCIES.map((currency) => {
+    const subset = rows.filter((r) => r.currency === currency);
+    return {
+      currency,
+      count: subset.length,
+      scenarioCents: total("scenarioCents", subset),
+      uncoveredBrl: subset.reduce((s, r) => s + r.uncoveredBrl, 0),
+    };
+  });
+  return {
+    asOf,
+    end,
+    rows,
+    cash,
+    currencies,
+    openingCashCents: opening,
+    totalCents: total("scenarioCents"),
+    baselineCents: total("baselineCents"),
+    budgetCents: total("budgetCents"),
+    deviationCents: total("deviationCents"),
+    shockImpactCents: total("shockImpactCents"),
+    uncoveredBrl: rows.reduce((s, r) => s + r.uncoveredBrl, 0),
+    protectedBrl: rows.reduce((s, r) => s + r.protectedBrl, 0),
+    overdue: rows.filter((r) => r.dueDate < asOf),
+    dueSoon: rows.filter(
+      (r) => r.dueDate >= asOf && r.dueDate <= addDays(asOf, 14),
+    ),
+    minimumCashCents: minimum,
+    firstShortfall,
+    closingCashCents: cash.at(-1).scenarioBalanceCents,
+    beyondHorizon: rows.filter((r) => r.dueDate > end).length,
+  };
+}
+
+const INPUT={"operations":[{"id":"IMP-26041","supplier":"Kanto Electronics","currency":"USD","amount":6800,"dueDate":"2026-10-23","budgetRate":5.1,"localCostBrl":2300,"hedgePercent":0,"hedgeRate":5.18,"status":"review","category":"Sensores industriais","country":"Japão"},{"id":"IMP-26044","supplier":"Nordwerk Technik","currency":"EUR","amount":4200,"dueDate":"2026-10-30","budgetRate":5.85,"localCostBrl":1850,"hedgePercent":50,"hedgeRate":5.98,"status":"open","category":"Conectores de precisão","country":"Alemanha"},{"id":"IMP-26047","supplier":"Han River Components","currency":"USD","amount":8500,"dueDate":"2026-11-06","budgetRate":5.2,"localCostBrl":3100,"hedgePercent":30,"hedgeRate":5.25,"status":"open","category":"Placas de controle","country":"Coreia do Sul"},{"id":"IMP-26048","supplier":"Bristol Instruments","currency":"GBP","amount":1900,"dueDate":"2026-11-10","budgetRate":6.8,"localCostBrl":1250,"hedgePercent":0,"hedgeRate":7,"status":"review","category":"Instrumentação","country":"Reino Unido"},{"id":"IMP-26052","supplier":"Kanto Electronics","currency":"USD","amount":5400,"dueDate":"2026-11-18","budgetRate":5.25,"localCostBrl":1950,"hedgePercent":70,"hedgeRate":5.3,"status":"open","category":"Sensores industriais","country":"Japão"},{"id":"IMP-26055","supplier":"Lumière Automation","currency":"EUR","amount":3100,"dueDate":"2026-11-27","budgetRate":5.9,"localCostBrl":1650,"hedgePercent":0,"hedgeRate":6,"status":"open","category":"Módulos de automação","country":"França"},{"id":"IMP-26058","supplier":"Pacific Circuit Supply","currency":"USD","amount":7200,"dueDate":"2026-12-04","budgetRate":5.3,"localCostBrl":2600,"hedgePercent":0,"hedgeRate":5.35,"status":"open","category":"Semicondutores","country":"Taiwan"},{"id":"IMP-26061","supplier":"Nordwerk Technik","currency":"EUR","amount":2800,"dueDate":"2026-12-11","budgetRate":5.95,"localCostBrl":1500,"hedgePercent":100,"hedgeRate":6.05,"status":"open","category":"Conectores de precisão","country":"Alemanha"},{"id":"IMP-26064","supplier":"Bristol Instruments","currency":"GBP","amount":2300,"dueDate":"2026-12-18","budgetRate":6.95,"localCostBrl":1400,"hedgePercent":50,"hedgeRate":7.1,"status":"open","category":"Instrumentação","country":"Reino Unido"},{"id":"IMP-26067","supplier":"Han River Components","currency":"USD","amount":6100,"dueDate":"2027-01-08","budgetRate":5.35,"localCostBrl":2200,"hedgePercent":0,"hedgeRate":5.4,"status":"open","category":"Placas de controle","country":"Coreia do Sul"},{"id":"IMP-26069","supplier":"Pacific Circuit Supply","currency":"USD","amount":3800,"dueDate":"2027-01-20","budgetRate":5.4,"localCostBrl":1600,"hedgePercent":0,"hedgeRate":5.4,"status":"open","category":"Semicondutores","country":"Taiwan"},{"id":"IMP-26031","supplier":"Lumière Automation","currency":"EUR","amount":2200,"dueDate":"2026-10-15","budgetRate":5.8,"localCostBrl":1200,"hedgePercent":100,"hedgeRate":5.85,"status":"paid","category":"Módulos de automação","country":"França"},{"id":"IMP-G101","supplier":"Shenzhen Motion","country":"China","currency":"USD","amount":1800,"dueDate":"2026-11-03","budgetRate":5.25,"localCostBrl":800,"hedgePercent":0,"hedgeRate":5.3,"status":"open","category":"Componentes industriais"},{"id":"IMP-G102","supplier":"Volga Instruments","country":"Rússia","currency":"USD","amount":1975,"dueDate":"2026-11-05","budgetRate":5.25,"localCostBrl":845,"hedgePercent":25,"hedgeRate":5.3,"status":"open","category":"Componentes industriais"},{"id":"IMP-G103","supplier":"Atlantic Controls","country":"Estados Unidos","currency":"USD","amount":2150,"dueDate":"2026-11-07","budgetRate":5.25,"localCostBrl":890,"hedgePercent":50,"hedgeRate":5.3,"status":"open","category":"Componentes industriais"},{"id":"IMP-G104","supplier":"Deccan Sensors","country":"Índia","currency":"USD","amount":2325,"dueDate":"2026-11-09","budgetRate":5.25,"localCostBrl":935,"hedgePercent":0,"hedgeRate":5.3,"status":"open","category":"Componentes industriais"},{"id":"IMP-G105","supplier":"Maple Circuits","country":"Canadá","currency":"USD","amount":2500,"dueDate":"2026-11-11","budgetRate":5.25,"localCostBrl":980,"hedgePercent":25,"hedgeRate":5.3,"status":"open","category":"Componentes industriais"},{"id":"IMP-G106","supplier":"Torino Precision","country":"Itália","currency":"EUR","amount":2675,"dueDate":"2026-11-13","budgetRate":6,"localCostBrl":1025,"hedgePercent":50,"hedgeRate":6.05,"status":"open","category":"Componentes industriais"},{"id":"IMP-G107","supplier":"Delta Components","country":"Países Baixos","currency":"EUR","amount":2850,"dueDate":"2026-12-15","budgetRate":6,"localCostBrl":1070,"hedgePercent":0,"hedgeRate":6.05,"status":"open","category":"Componentes industriais"},{"id":"IMP-G108","supplier":"Alpine Systems","country":"Suíça","currency":"EUR","amount":3025,"dueDate":"2026-12-17","budgetRate":6,"localCostBrl":1115,"hedgePercent":25,"hedgeRate":6.05,"status":"open","category":"Componentes industriais"},{"id":"IMP-G109","supplier":"Straits Automation","country":"Singapura","currency":"USD","amount":3200,"dueDate":"2026-12-19","budgetRate":5.25,"localCostBrl":1160,"hedgePercent":50,"hedgeRate":5.3,"status":"open","category":"Componentes industriais"},{"id":"IMP-G110","supplier":"Southern Controls","country":"Austrália","currency":"USD","amount":3375,"dueDate":"2026-12-21","budgetRate":5.25,"localCostBrl":1205,"hedgePercent":0,"hedgeRate":5.3,"status":"open","category":"Componentes industriais"}],"rates":{"USD":5.5007,"EUR":6.1487,"GBP":7.3423},"asOf":"2026-10-27","openingCashBrl":255000,"receipts":[{"date":"2026-11-05","amountBrl":42000},{"date":"2026-11-20","amountBrl":38000},{"date":"2026-12-05","amountBrl":45000},{"date":"2026-12-20","amountBrl":30000},{"date":"2027-01-05","amountBrl":35000}],"horizon":90};
+const formatBrl=value=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(value);
+const fmtDate=value=>new Intl.DateTimeFormat('pt-BR',{day:'2-digit',month:'short',timeZone:'UTC'}).format(new Date(value+'T12:00:00Z')).replace('.','');
+const xml=value=>String(value??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+function editorialState(input,shock){
+ if(!Number.isFinite(shock)||shock<0||shock>.2)throw Error('Choque USD deve estar entre 0 e 20%.');
+ const run=(operations,usd)=>analyzeTrade({...input,operations,shocks:{USD:usd,EUR:0,GBP:0}});
+ const base=run(input.operations,0),analysis=run(input.operations,shock);
+ const severe=run(input.operations,.2);
+ const hedges=[0,50,100].map(coverage=>{
+  const ops=input.operations.map(row=>row.currency==='USD'?{...row,hedgePercent:coverage,hedgeRate:input.rates.USD}:row);
+  const a=run(ops,shock);
+  return {coverage,analysis:a,fundingCents:Math.max(0,-a.minimumCashCents),costPoints:[0,.1,.2].map(s=>run(ops,s).totalCents)};
+ });
+ return {shock,base,analysis,severe,hedges,fundingCents:Math.max(0,-analysis.minimumCashCents),baseFundingCents:Math.max(0,-base.minimumCashCents)};
+}
+function answerMarkup(s){
+ return `${s.analysis.firstShortfall?'O saldo fica negativo em <b>'+fmtDate(s.analysis.firstShortfall)+'</b>.':'Não há saldo negativo no horizonte.'} ${s.baseFundingCents?'A base já precisa de '+formatBrl(s.baseFundingCents/100)+'.':'A base não exige aporte.'}`;
+}
+function chartDescription(s){return `Projeção de caixa em 90 dias. Dólar mais ${Math.round(s.shock*100)}%. Aporte mínimo ${formatBrl(s.fundingCents/100)}. ${s.analysis.firstShortfall?'Primeiro déficit '+s.analysis.firstShortfall: 'Sem déficit'}.`;}
+function profileSvg(s,input){
+ const left=53,right=700,top=29,bottom=281;
+ const lo=Math.min(0,s.severe.minimumCashCents),hi=Math.max(s.base.openingCashCents,...s.base.cash.map(d=>d.scenarioBalanceCents));
+ const padding=(hi-lo)*.11;
+ const y=v=>bottom-(v-lo+padding)/(hi-lo+2*padding)*(bottom-top);
+ const x=date=>left+(Date.parse(date)-Date.parse(input.asOf))/(86400000*input.horizon)*(right-left);
+ const path=a=>[{date:input.asOf,scenarioBalanceCents:a.openingCashCents},...a.cash].map((d,i)=>i?`H${x(d.date).toFixed(1)}V${y(d.scenarioBalanceCents).toFixed(1)}`:`M${left},${y(d.scenarioBalanceCents).toFixed(1)}`).join(' ');
+ let svg=`<rect x="${left}" y="${y(0)}" width="${right-left}" height="${bottom-y(0)}" fill="#a34d32" opacity=".045"/>`;
+ for(let n=0;n<4;n++){const v=lo+(hi-lo)*n/3;svg+=`<line x1="${left}" x2="${right}" y1="${y(v)}" y2="${y(v)}" stroke="#dedad0"/><text x="39" y="${y(v)+4}" text-anchor="end" font-family="monospace" font-size="10" fill="#76786d">${Math.round(v/1e5)}</text>`;}
+ svg+=`<line x1="${left}" x2="${right}" y1="${y(0)}" y2="${y(0)}" stroke="#9c9c8d" stroke-dasharray="2 4"/><text x="${right+9}" y="${y(0)+4}" fill="#77796c" font-family="monospace" font-size="9">zero</text><path d="${path(s.base)}" stroke="#999c8d" stroke-width="1.6" fill="none"/><path d="${path(s.analysis)}" stroke="#a34d32" stroke-width="2.6" fill="none"/>`;
+ const baselineEnd=s.base.cash.at(-1).scenarioBalanceCents,scenarioEnd=s.analysis.cash.at(-1).scenarioBalanceCents;
+ svg+=`<text x="${right-3}" y="${y(baselineEnd)-11}" text-anchor="end" font-family="monospace" font-size="10" fill="#7a7d6e">${s.shock===0?'base = cenário':'base'}</text>`;
+ if(s.shock>0)svg+=`<text x="${right-3}" y="${Math.min(306,y(scenarioEnd)+19)}" text-anchor="end" font-family="monospace" font-size="10" fill="#a34d32">USD +${Math.round(s.shock*100)}%</text>`;
+ const d=s.analysis.cash.find(d=>d.date===s.analysis.firstShortfall);
+ if(d){const px=x(d.date),py=y(d.scenarioBalanceCents);svg+=`<line x1="${px}" x2="${px}" y1="30" y2="${py}" stroke="#a34d32" stroke-opacity=".4" stroke-dasharray="2 4"/><circle cx="${px}" cy="${py}" r="4" fill="#a34d32"/><text x="${Math.max(left+2,Math.min(right-240,px-70))}" y="17" font-family="monospace" font-size="10" fill="#a34d32">${fmtDate(d.date)}: saldo negativo</text>`;}
+ for(const offset of [0,30,60,90]){const d=addDays(input.asOf,offset);svg+=`<text x="${x(d)}" y="333" text-anchor="${offset===0?'start':offset===90?'end':'middle'}" font-family="monospace" font-size="10" fill="#727568">${fmtDate(d)}</text>`;}
+ return svg;
+}
+function waterfallSvg(s,input){
+ const a=s.analysis;
+ const groups=new Map();for(const r of a.rows.filter(r=>r.dueDate<=a.end)){groups.set(r.supplier,(groups.get(r.supplier)||0)+r.scenarioCents);}
+ const sorted=[...groups].sort((a,b)=>b[1]-a[1]),inflows=a.cash.reduce((n,d)=>n+d.inflowCents,0);
+ const entries=[{label:'Caixa inicial',value:a.openingCashCents,total:true},{label:'Recebimentos',value:inflows},...sorted.slice(0,4).map(([name,value])=>({label:name,value:-value})),{label:'Outros',value:-sorted.slice(4).reduce((n,p)=>n+p[1],0)},{label:'Saldo final',value:a.closingCashCents,total:true}];
+ let balance=0;const bars=entries.map((e,i)=>{const before=e.total?0:balance;balance=e.total?e.value:balance+e.value;return {...e,from:before,to:balance};});
+ const lo=Math.min(0,...bars.flatMap(b=>[b.from,b.to])),hi=Math.max(...bars.flatMap(b=>[b.from,b.to]));
+ const y=v=>240-(v-lo)/(hi-lo||1)*195;
+ const width=68,gap=17,x=i=>19+i*(width+gap);
+ let svg=`<line x1="14" x2="697" y1="${y(0)}" y2="${y(0)}" stroke="#c3c3b4"/>`;
+ bars.forEach((b,i)=>{const upper=Math.min(y(b.from),y(b.to)),height=Math.max(1,Math.abs(y(b.from)-y(b.to))),fill=b.total?(b.value<0?'#a34d32':'#444a3d'):'#b8b9ab';svg+=`<rect x="${x(i)}" y="${upper}" width="${width}" height="${height}" fill="${fill}"/><text x="${x(i)+width/2}" y="${b.to>=b.from?upper-9:upper+height+16}" text-anchor="middle" font-family="monospace" font-size="10" fill="${b.to<0&&b.total?'#a34d32':'#53594a'}">${b.value>0&&!b.total?'+':''}${Math.round(b.value/1e5)} mil</text>`;
+ const words=b.label.split(' '),line1=words.slice(0,2).join(' '),line2=words.slice(2).join(' ');svg+=`<text x="${x(i)+width/2}" y="281" text-anchor="middle" font-family="Arial" font-size="9" fill="#747869"><tspan x="${x(i)+width/2}">${xml(line1)}</tspan><tspan x="${x(i)+width/2}" dy="13">${xml(line2)}</tspan></text>`;
+ if(i<bars.length-1)svg+=`<line x1="${x(i)+width}" x2="${x(i+1)}" y1="${y(b.to)}" y2="${y(b.to)}" stroke="#aeb3a0" stroke-dasharray="2 3"/>`;
+ });return svg;
+}
+function driversMarkup(s){return s.analysis.rows.filter(r=>r.currency==='USD').sort((a,b)=>b.shockImpactCents-a.shockImpactCents).slice(0,3).map(r=>`<div class="driver"><span>${xml(r.supplier)}<small>${xml(r.id)} / ${fmtDate(r.dueDate)}</small></span><b>+${formatBrl(r.shockImpactCents/100)}</b></div>`).join('');}
+function hedgeMarkup(s){
+ const all=s.hedges.flatMap(h=>h.costPoints),min=Math.min(...all),max=Math.max(...all);
+ return s.hedges.map(h=>{const points=h.costPoints.map((v,i)=>`${5+i*40},${11-(v-min)/(max-min||1)*9}`).join(' ');return `<tr><td>${h.coverage}%<small>fixação hipotética</small></td><td>${formatBrl(h.analysis.totalCents/100)}<svg class="mini-range" viewBox="0 0 90 14" role="img" aria-label="Sensibilidade do custo total a USD mais zero, dez e vinte por cento"><polyline points="${points}" fill="none" stroke="#777c6b" stroke-width="1.5"/></svg></td><td class="${h.analysis.shockImpactCents?'risk-number':''}">+${formatBrl(h.analysis.shockImpactCents/100)}<small>ao choque selecionado</small></td><td class="${h.fundingCents?'risk-number':''}">${formatBrl(h.fundingCents/100)}<small>mínimo no horizonte</small></td></tr>`;}).join('');
+}
+function heatmapMarkup(s,input){
+ const cells=Array.from({length:3},()=>Array(13).fill(0));
+ for(const r of s.analysis.rows){const date=r.dueDate<input.asOf?input.asOf:r.dueDate,week=Math.floor((Date.parse(date)-Date.parse(input.asOf))/86400000/7),currency=['USD','EUR','GBP'].indexOf(r.currency);if(week>=0&&week<13&&date<=s.analysis.end)cells[currency][week]+=r.scenarioCents;}
+ const max=Math.max(1,...cells.flat());
+ return '<span></span>'+Array.from({length:13},(_,i)=>`<span class="week" title="A partir de ${addDays(input.asOf,i*7)}">S${String(i+1).padStart(2,'0')}</span>`).join('')+cells.map((row,c)=>`<span class="currency">${['USD','EUR','GBP'][c]}</span>`+row.map((v,w)=>{const label=['USD','EUR','GBP'][c]+', semana '+(w+1)+': '+formatBrl(v/100);return `<span class="cell" tabindex="0" title="${xml(label)}" aria-label="${xml(label)}" data-label="${xml(label)}" style="--shade:${.025+.63*v/max}"><span class="sr-only">${xml(label)}</span></span>`;}).join('')).join('');
+}
+
+let activeShock=.1;
+const ui=id=>document.getElementById(id);
+function render(){
+ const state=editorialState(INPUT,activeShock);
+ ui('question-shock').textContent=Math.round(activeShock*100);
+ ui('shock-output').textContent='+'+Math.round(activeShock*100)+'%';
+ ui('funding').textContent=formatBrl(state.fundingCents/100);
+ ui('answer-text').innerHTML=answerMarkup(state);
+ ui('profile').innerHTML=profileSvg(state,INPUT);
+ ui('profile').setAttribute('aria-label',chartDescription(state));
+ ui('delta').innerHTML='vs. base <b>+'+formatBrl((state.fundingCents-state.baseFundingCents)/100)+'</b> de aporte';
+ ui('waterfall').innerHTML=waterfallSvg(state,INPUT);
+ ui('cost-delta').textContent='+'+formatBrl(state.analysis.shockImpactCents/100);
+ ui('drivers').innerHTML=driversMarkup(state);
+ ui('hedge-body').innerHTML=hedgeMarkup(state);
+ ui('maturity-heatmap').innerHTML=heatmapMarkup(state,INPUT);
+}
+ui('usd-shock').addEventListener('input',event=>{activeShock=Number(event.target.value)/100;render()});
+ui('download-report').onclick=()=>{const state=editorialState(INPUT,activeShock);const report={model:'USD-only contractual sensitivity',disclosure:'Carteira fictícia; sem previsão ou execução.',input:INPUT,shock:{USD:activeShock,EUR:0,GBP:0},fundingCents:state.fundingCents,baseFundingCents:state.baseFundingCents,dailyLedger:state.analysis.cash,hedgeHypotheses:state.hedges.map(h=>({coverage:h.coverage,totalCents:h.analysis.totalCents,shockImpactCents:h.analysis.shockImpactCents,fundingCents:h.fundingCents}))};const url=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='risklab-estudo-editorial.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);ui('report-status').textContent='Memória exportada com premissas e movimentos diários.';};
+render();document.documentElement.classList.add('js-ready');
+</script>
+</body></html>

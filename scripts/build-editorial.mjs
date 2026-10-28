@@ -1,0 +1,15 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {editorialState,formatBrl,answerMarkup,profileSvg,waterfallSvg,driversMarkup,hedgeMarkup,heatmapMarkup,chartDescription} from '../design/editorial-model.mjs';
+const demo=JSON.parse(await readFile('web/trade-demo.json','utf8'));
+const market=JSON.parse(await readFile('web/market-snapshot.json','utf8'));
+const rates=Object.fromEntries(['USD','EUR','GBP'].map(c=>[c,market.currencies[c].points.filter(p=>p.date<=demo.asOf).at(-1).value]));
+const input={operations:demo.operations,rates,asOf:demo.asOf,openingCashBrl:demo.openingCashBrl,receipts:demo.receipts,horizon:90};
+const state=editorialState(input,.1);
+const replacements={__FUNDING__:formatBrl(state.fundingCents/100),__ANSWER__:answerMarkup(state),__CHART_LABEL__:chartDescription(state),__PROFILE__:profileSvg(state,input),__DELTA__:'vs. base <b>+'+formatBrl((state.fundingCents-state.baseFundingCents)/100)+'</b> de aporte',__USD__:rates.USD.toFixed(4).replace('.',','),__WATERFALL__:waterfallSvg(state,input),__COST_DELTA__:'+'+formatBrl(state.analysis.shockImpactCents/100),__DRIVERS__:driversMarkup(state),__HEATMAP__:heatmapMarkup(state,input),__HEDGE__:hedgeMarkup(state),__RECEIPTS__:demo.receipts.map(r=>r.date+': '+formatBrl(r.amountBrl)).join(' · ')};
+let html=await readFile('design/editorial.html','utf8');
+for(const [key,value]of Object.entries(replacements))html=html.replaceAll(key,value);
+const engine=(await readFile('web/trade-engine.mjs','utf8')).replaceAll('export ','');
+const model=(await readFile('design/editorial-model.mjs','utf8')).replace(/^import .*;\n/m,'').replaceAll('export ','');
+html=html.replace('/*__ENGINE__*/',()=>engine).replace('/*__INPUT__*/',()=>JSON.stringify(input).replaceAll('<','\\u003c')).replace('/*__MODEL__*/',()=>model);
+await writeFile('web/editorial.html',html);
+console.log('Editorial HTML: fully populated, standalone and interactive.');

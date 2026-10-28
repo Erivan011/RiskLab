@@ -6,6 +6,7 @@ const types = {
   css: "text/css",
   mjs: "text/javascript",
   json: "application/json",
+  png: "image/png",
 };
 http
   .createServer(async (req, res) => {
