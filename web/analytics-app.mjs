@@ -1,3 +1,5 @@
+import {analyticsMarket,defaultEvaluationStart} from './analytics-market.mjs';
+import {fetchMarket} from './market-data.mjs';
 import * as PortfolioEngine from './portfolio-analytics.mjs';
 import {escapeHtml as esc,money,pct,number,equityChart,drawdownChart,breachesChart,attributionTable,correlationTable,resultConclusions} from './analytics-viz.mjs';
 import {analyticsReport,analyticsJson,analyticsCsv} from './analytics-report.mjs';
@@ -26,10 +28,10 @@ function installDataset(weights){
  document.querySelectorAll('[data-weight]').forEach(input=>input.oninput=updateWeightTotal);updateWeightTotal();
  $('analytics-benchmark').innerHTML=dataset.assetNames.map((name,index)=>`<option value="${index}">${esc(name)}</option>`).join('')+'<option value="-1">1/N diário · sem custos</option>';
  $('analytics-end').value=dataset.rows.at(-1).date;
- $('analytics-start').value=dataset.source.kind==='bcb_returns'?'2023-01-01':dataset.rows[Math.min(Number($('analytics-window').value),dataset.rows.length-2)].date;
+ $('analytics-start').value=dataset.source.kind==='bcb_returns'?defaultEvaluationStart(dataset):dataset.rows[Math.min(Number($('analytics-window').value),dataset.rows.length-2)].date;
 }
 function busy(active){
- $('analytics-fields').disabled=active;$('analytics-results').setAttribute('aria-busy',String(active));
+ $('analytics-follow').disabled=active;$('analytics-fields').disabled=active;$('analytics-results').setAttribute('aria-busy',String(active));
  buttons.forEach(id=>$(id).disabled=active||!result);
  if(!active)$('analytics-cost').disabled=$('analytics-policy').value==='buyhold';
 }
@@ -91,6 +93,8 @@ function renderStress(){
  $('portfolio-stress-result').innerHTML=`<span>VARIAÇÃO NO CENÁRIO</span><strong class="${stress.pnl<0?'loss':''}">${money(stress.pnl)}</strong><small>${pct(stress.returnRate)} · saldo hipotético ${money(stress.stressedValue)}</small><div>${stress.pnlByAsset.map((pnl,index)=>`<p><span>${esc(result.assetNames[index])}</span><b>${money(pnl)}</b></p>`).join('')}</div>`;
  $('analytics-conclusions').innerHTML=resultConclusions(result,stress).map(text=>`<li>${esc(text)}</li>`).join('');
 }
+$('analytics-end').onchange=()=>{$('analytics-follow').checked=false;};
+$('analytics-start').onchange=()=>{$('analytics-follow').checked=false;};
 $('analytics-form').onsubmit=event=>{event.preventDefault();apply();};
 $('analytics-policy').onchange=()=>$('analytics-cost').disabled=$('analytics-policy').value==='buyhold';
 function equalizeWeights(){const fields=[...document.querySelectorAll('[data-weight]')];let assigned=0;fields.forEach((input,index)=>{const value=index===fields.length-1?10000-assigned:Math.floor(10000/fields.length);input.value=String(value/100);assigned+=value;});updateWeightTotal();}
@@ -102,11 +106,12 @@ $('analytics-file').onchange=async event=>{
   const text=await file.text(),parsed=PortfolioEngine.parsePriceCsv(text);
   if(parsed.rows.length<128)throw Error('Este painel precisa de ao menos 129 linhas de preços completos para a janela mínima de 126 observações.');
   let sha256=null;if(crypto.subtle)sha256=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text)))].map(b=>b.toString(16).padStart(2,'0')).join('');
+  $('analytics-follow').checked=false;$('analytics-live-status').textContent='Histórico CSV local. Atualização BCB suspensa para preservar os dados importados.';
   dataset={...parsed,source:{kind:'user_prices',label:file.name,sha256,quality:parsed.quality,disclosure:`Preços fornecidos pelo usuário. ${parsed.quality.excludedRows} linhas incompletas excluídas, sem preenchimento de preços. Moeda e ajustes corporativos não são verificados automaticamente.`}};
   const weights=parsed.assetNames.map(()=>0);weights[0]=100;installDataset(weights);equalizeWeights();shocks=[];await apply();
  }catch(error){showError(error);busy(false);}
 };
-$('restore-analytics-data').onclick=()=>{dataset=structuredClone(original);$('analytics-window').value='252';installDataset([50,30,20]);shocks=[];apply();};
+$('restore-analytics-data').onclick=()=>{dataset=structuredClone(original);$('analytics-window').value='252';installDataset([50,30,20]);$('analytics-follow').checked=true;shocks=[];apply().then(()=>refreshHistory());};
 $('download-price-template').onclick=()=>{
  let levels=[100,100,100];const lines=['date,USD_BRL_INDEX,EUR_BRL_INDEX,GBP_BRL_INDEX',original.source.firstPriceDate+',100,100,100'];
  for(const row of original.rows){levels=levels.map((value,index)=>value*(1+row.values[index]));lines.push(row.date+','+levels.map(value=>value.toFixed(10)).join(','));}
@@ -122,4 +127,28 @@ $('download-analytics-report').onclick=()=>download(analyticsReport(result,stres
 $('print-analytics-report').onclick=()=>$('analytics-report-frame').contentWindow.print();
 $('export-analytics-json').onclick=()=>download(analyticsJson(result,stress),'risklab-memoria-'+result.endDate+'.json','application/json');
 $('export-analytics-csv').onclick=()=>download(analyticsCsv(result),'risklab-backtest-'+result.endDate+'.csv','text/csv;charset=utf-8');
-installDataset([50,30,20]);apply();
+let refreshing=false;
+async function refreshHistory(){
+ if(refreshing||dataset.source.kind!=='bcb_returns'||$('analytics-fields').disabled||$('analytics-report-preview').open)return;
+ refreshing=true;busy(true);$('analytics-refresh').disabled=true;
+ $('analytics-live-status').textContent='Consultando referências diárias do Banco Central…';
+ try{
+  const market=await fetchMarket('/api/market',{timeoutMs:25000});
+  const next=analyticsMarket(market),last=next.rows.at(-1).date;
+  if(last<dataset.rows.at(-1).date)throw Error('A fonte retornou uma data anterior ao histórico já disponível.');
+  dataset=next;
+  if($('analytics-follow').checked){$('analytics-start').value=defaultEvaluationStart(next);$('analytics-end').value=last;}
+  // Refresh provenance as well as prices so exported reports identify the actual check.
+  await apply();
+  const checked=new Date(market.checkedAt).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'});
+  $('analytics-live-status').textContent=`Dados até ${last}. Consulta: ${checked} (Brasília). ${market.status==='updated'?'Fonte consultada com sucesso.':market.status==='partial'?'Atualização parcial; datas comuns e histórico de reserva utilizados.':'Fonte indisponível; histórico de reserva em uso.'} Verificação automática a cada 15 min enquanto esta página estiver aberta. Referências diárias, sem atualização intradiária.`;
+ }catch(error){$('analytics-live-status').textContent=`Atualização indisponível: ${error.message} Mantido o histórico até ${dataset.rows.at(-1).date}. Nova consulta em até 15 min.`;}
+ finally{refreshing=false;busy(false);$('analytics-refresh').disabled=false;}
+}
+$('analytics-refresh').onclick=refreshHistory;
+$('analytics-follow').onchange=()=>{if($('analytics-follow').checked&&dataset.source.kind==='bcb_returns'){$('analytics-start').value=defaultEvaluationStart(dataset);$('analytics-end').value=dataset.rows.at(-1).date;apply();}};
+setInterval(()=>{if(!document.hidden)refreshHistory();},15*60*1000);
+let lastFocusCheck=0;document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-lastFocusCheck>15*60*1000){lastFocusCheck=Date.now();refreshHistory();}});
+installDataset([50,30,20]);
+$('analytics-live-status').textContent='Histórico de reserva até '+dataset.rows.at(-1).date+'. Consultando novas observações…';
+apply().then(()=>refreshHistory());

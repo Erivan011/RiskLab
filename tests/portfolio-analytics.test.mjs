@@ -83,7 +83,7 @@ test('hosted analytics packages the source history, report and module worker wit
  const {default:worker}=await import('../worker/index.js');
  const page=await worker.fetch(new Request('https://risklab.test/analytics.html'));assert.equal(page.status,200);
  const html=await page.text();const encoded=html.match(/<script id="analytics-dataset" type="application\/json">([\s\S]*?)<\/script>/)[1];
- const data=JSON.parse(encoded);assert.equal(data.rows.length,2507);assert.equal(data.source.kind,'bcb_returns');assert.match(html,/sandbox="allow-same-origin allow-modals"/);
+ const data=JSON.parse(encoded);assert.ok(data.rows.length>600);assert.ok(data.rows.at(-1).date>='2026-10-28');assert.equal(data.source.kind,'bcb_returns');assert.match(html,/sandbox="allow-same-origin allow-modals"/);
  for(const path of ['analytics-app.mjs','analytics-viz.mjs','analytics-report.mjs','portfolio-analytics.mjs','portfolio-worker.mjs']){
   const asset=await worker.fetch(new Request('https://risklab.test/'+path));assert.equal(asset.status,200);assert.match(asset.headers.get('content-type'),/text\/javascript/);
  }

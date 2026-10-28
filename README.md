@@ -76,7 +76,7 @@ npm run build
 npm run validate
 ```
 
-Os 77 testes JavaScript verificam estresse combinado, aporte intermediário com saldo final positivo, recebimentos anteriores à data-base, atribuição sequencial e reconciliação, além de proteção parcial/completa, exclusão de pagos, conservação de centavos e caixa, vencidos, corte de horizonte, pagamentos e recebimentos na mesma data, rejeição de CSV inválido e escape de fórmulas. A pesquisa mantém testes de ausência de vazamento temporal e comparação com a implementação Python.
+Os 80 testes JavaScript verificam estresse combinado, aporte intermediário com saldo final positivo, recebimentos anteriores à data-base, atribuição sequencial e reconciliação, além de proteção parcial/completa, exclusão de pagos, conservação de centavos e caixa, vencidos, corte de horizonte, pagamentos e recebimentos na mesma data, rejeição de CSV inválido e escape de fórmulas. A pesquisa mantém testes de ausência de vazamento temporal e comparação com a implementação Python.
 
 Detalhes de decisões e limitações: [docs/DECISIONS.md](docs/DECISIONS.md). Código sob licença MIT.
 
@@ -139,3 +139,13 @@ npm test
 ```
 
 Custos de entrada/saída, impostos, juros, aluguel, liquidez, spreads variáveis, alavancagem e posições vendidas não são modelados. O benchmark de um ativo é passivo; 1/N é rebalanceado diariamente, sem custos. Os resultados descrevem a amostra e os parâmetros definidos; não são recomendação de investimento, previsão garantida ou validação regulatória.
+
+### Atualização automática do laboratório (2026)
+
+`analytics.html` abre com avaliação no último ano do histórico (2026 nesta versão). O snapshot incorporado inclui referências oficiais até 28/10/2026, consultadas diretamente no BCB; dados de 2024–2025 servem às janelas anteriores, sem antecipar retornos futuros. A pesquisa histórica separada e seus testes NumPy permanecem reproduzíveis.
+
+O laboratório consulta `/api/market` ao abrir, a cada 15 minutos quando visível e ao retornar à página após esse intervalo. O servidor usa cache em memória de até 15 minutos e une preços oficiais ao snapshot. `analytics-market.mjs` sincroniza datas comuns e calcula novos retornos, sem preenchimento ou datas futuras. Diagnóstico, curvas, excedências, cenários e relatórios são recalculados com os mesmos parâmetros. Referências são diárias; não há feed intradiário nem atribuição causal às eleições.
+
+“Acompanhar o ano mais recente” atualiza o intervalo de avaliação. Alterar datas desativa esse acompanhamento, preservando a análise escolhida. CSV permanece local e não recebe atualização BCB. Falhas e atualização parcial são informadas; o último histórico válido permanece disponível. O botão manual consulta a mesma API, respeitando seu cache.
+
+Para renovar o snapshot offline antes de publicar: `node scripts/refresh-market.mjs`, seguido de `npm test`. A atualização normal do site não depende de nova publicação. A memória JSON e o relatório registram a consulta, estado da fonte, séries e data de cada moeda.

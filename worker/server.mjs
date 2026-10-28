@@ -26,9 +26,10 @@ export function validateSeries(raw) {
 }
 export async function marketResponse(fetcher = fetch, now = new Date()) {
   const fallback = JSON.parse(ASSETS["/market-snapshot.json"].body);
-  const iso = now.toISOString().slice(0, 10),
+  const iso = new Intl.DateTimeFormat("en-CA", {timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit"}).format(now),
     [y, m, d] = iso.split("-");
   const end = `${d}/${m}/${y}`;
+  for (const currency of Object.values(fallback.currencies)) currency.points = currency.points.filter(point => point.date <= iso);
   const series = [
     ["USD", 1],
     ["EUR", 21619],
@@ -49,11 +50,12 @@ export async function marketResponse(fetcher = fetch, now = new Date()) {
             dataFinal: end,
           });
         const response = await fetcher(url, {
-          signal: AbortSignal.timeout(10000),
+          signal: AbortSignal.timeout(20000),
           headers: { accept: "application/json" },
         });
         if (!response.ok) throw Error("Fonte indisponível.");
-        const received = validateSeries(await response.json());
+        const received = validateSeries(await response.json()).filter(point => point.date <= iso);
+        if (!received.length) throw Error("Sem observações válidas.");
         const merged = new Map(cached.map((p) => [p.date, p]));
         for (const point of received) merged.set(point.date, point);
         const points = [...merged.values()]

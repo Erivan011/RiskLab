@@ -27,7 +27,8 @@ test("Official-source refresh uses only fixed SGS endpoints and date filters", a
     assert.ok(url.startsWith("https://api.bcb.gov.br/dados/serie/bcdata.sgs."));
     assert.ok(url.includes("dataInicial="));
   }
-  assert.equal(r.currencies.USD.points.at(-1).date, "2026-10-26");
+  assert.ok(r.currencies.USD.points.at(-1).date <= "2026-10-27");
+  assert.equal(r.currencies.USD.points.find(p=>p.date==="2026-10-26").value,5.2);
 });
 test("One failed provider response preserves explicit per-currency snapshot status", async () => {
   const r = await marketResponse(async (url) =>
