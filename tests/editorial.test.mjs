@@ -32,4 +32,8 @@ test('editorial is the public landing while the operational workspace remains re
  const html=await landing.text();assert.match(html,/id="usd-shock"/);assert.match(html,/href="\.\/operations\.html"/);
  const operations=await worker.fetch(new Request('https://risklab.test/operations.html'));
  assert.equal(operations.status,200);assert.match(await operations.text(),/id="operations-table"/);
+ for(const path of ['editorial.css','editorial-app.mjs','editorial-model.mjs','editorial-motion.mjs']){
+   const asset=await worker.fetch(new Request('https://risklab.test/'+path));
+   assert.equal(asset.status,200,path);assert.match(asset.headers.get('content-type'),path.endsWith('.css')?/text\/css/:/text\/javascript/);
+ }
 });

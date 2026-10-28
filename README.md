@@ -84,4 +84,14 @@ Detalhes de decisões e limitações: [docs/DECISIONS.md](docs/DECISIONS.md). C�
 
 A página principal (também em `/editorial.html`) apresenta a narrativa em quatro atos: situação, causas, hipóteses de proteção e método. O slider altera somente USD de 0 a 20%; EUR e GBP ficam constantes. A carteira e o snapshot são fixos, sem ler o workspace salvo. A tabela de proteção simula fixação USD a 0%, 50% e 100% na referência do snapshot, sem precificar um hedge contratável.
 
-O HTML é autossuficiente: conteúdo, SVGs, dados e motor estão embutidos, com estado inicial visível mesmo sem JavaScript. O build o gera a partir de `design/editorial.html`, `design/editorial-model.mjs` e do motor compartilhado. A imagem Open Graph é um PNG de 1200 × 627, construído com a mesma projeção de demonstração. O editorial abre em tema escuro por padrão; o botão de tema salva a preferência neste navegador. O ambiente completo de operações fica em `/operations.html`.
+A página principal serve HTML pré-preenchido, `web/editorial.css` e módulos JavaScript separados (`editorial-app.mjs`, `editorial-motion.mjs`, `editorial-model.mjs`). O build mantém `/editorial.html` como versão autossuficiente para download, com os mesmos cálculos e comportamento. O estado inicial é visível mesmo sem JavaScript. A imagem Open Graph é um PNG de 1200 × 627, construído com a mesma projeção de demonstração. O editorial abre em tema escuro por padrão; o botão de tema salva a preferência neste navegador. O ambiente completo de operações fica em `/operations.html`.
+
+### Interações do editorial
+
+- Traçado inicial da curva, interpolação das posições ao alterar USD e transição dos valores, sem interferir nos cálculos em centavos.
+- Leitura por evento no gráfico com ponteiro, toque e teclado (setas, Home, End e Escape).
+- Reprodução explícita de USD 0 → 20% em cinco segundos, com pausa, interrupção por controle manual e parada ao ocultar a página. Não simula dados de mercado em tempo real.
+- Entrada das seções e barras ao rolar, microinterações e indicação de progresso de leitura.
+- `prefers-reduced-motion` desativa transições e reprodução automática; o slider manual continua disponível. Sem bibliotecas de animação ou dependências novas.
+
+A abertura calcula o caixa no navegador em JavaScript. A API Java 17/BigDecimal é uma conferência opcional no workspace de operações; Python e SQL pertencem à trilha quantitativa de pesquisa. Não há banco SQL conectado ao editorial.

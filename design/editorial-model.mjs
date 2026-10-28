@@ -34,7 +34,7 @@ export function profileSvg(s,input){
  const d=s.analysis.cash.find(d=>d.date===s.analysis.firstShortfall);
  if(d){const px=x(d.date),py=y(d.scenarioBalanceCents);svg+=`<line x1="${px}" x2="${px}" y1="30" y2="${py}" stroke="var(--risk)" stroke-opacity=".4" stroke-dasharray="2 4"/><circle cx="${px}" cy="${py}" r="4" fill="var(--risk)"/><text x="${Math.max(left+2,Math.min(right-240,px-70))}" y="17" font-family="monospace" font-size="10" fill="var(--risk)">${fmtDate(d.date)}: saldo negativo</text>`;}
  for(const offset of [0,30,60,90]){const d=addDays(input.asOf,offset);svg+=`<text x="${x(d)}" y="333" text-anchor="${offset===0?'start':offset===90?'end':'middle'}" font-family="monospace" font-size="10" fill="var(--muted)">${fmtDate(d)}</text>`;}
- return svg;
+ return `<g data-profile-scale data-low="${lo}" data-high="${hi}" data-padding="${padding}">${svg}</g>`;
 }
 export function waterfallSvg(s,input){
  const a=s.analysis;
