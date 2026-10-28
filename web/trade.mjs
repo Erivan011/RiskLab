@@ -1,3 +1,4 @@
+import { liquidityBoundary, paymentLadder } from "./liquidity-analysis.mjs";
 import { verifyJavaPrice } from "./java-pricing.mjs";
 import {
   analyzeTrade,
@@ -65,8 +66,8 @@ let shocks = { USD: 0, EUR: 0, GBP: 0 },
 const viewNames = {
   overview: [
     "Visão geral",
-    "Mesa de câmbio",
-    "Pagamentos, posições e liquidez em uma única mesa.",
+    "Controle de liquidez internacional",
+    "Da obrigação ao caixa: identifique o evento, investigue a causa e compare o efeito.",
   ],
   operations: [
     "Operações",
@@ -208,6 +209,7 @@ function render() {
   renderInvestigation();
   renderDiagnostics();
   renderGlobal();
+  renderLiquidityDesk();
   $("currency-exposure").innerHTML = r.currencies
     .map((c, i) => {
       const principal = r.rows
@@ -380,7 +382,7 @@ function renderCashChart() {
   let svg = "";
   for (let i = 0; i < 4; i++) {
     const v = low + ((high - low) * i) / 3;
-    svg += `<line x1="${left}" x2="${right}" y1="${y(v)}" y2="${y(v)}" stroke="#edf0e8"/><text x="4" y="${y(v) + 3}" fill="#6b785f" font-size="9">${Math.round(v / 1e5)} mil</text>`;
+    svg += `<line x1="${left}" x2="${right}" y1="${y(v)}" y2="${y(v)}" stroke="#dee5ec"/><text x="4" y="${y(v) + 3}" fill="#67758a" font-size="9">${Math.round(v / 1e5)} mil</text>`;
   }
   const path = (key) =>
     points
@@ -392,7 +394,7 @@ function renderCashChart() {
       .join(" ");
   const basePath = path("baseBalanceCents"),
     scenarioPath = path("scenarioBalanceCents");
-  svg += `<path d="${basePath} L${right},${bottom} L${left},${bottom} Z" fill="#edf3e8" opacity=".65"/><path d="${basePath}" stroke="#8eac8c" stroke-width="2" fill="none"/><path d="${scenarioPath}" stroke="#bd573b" stroke-width="2" stroke-dasharray="5 3" fill="none"/>`;
+  svg += `<path d="${basePath} L${right},${bottom} L${left},${bottom} Z" fill="#e7eefb" opacity=".65"/><path d="${basePath}" stroke="#3c65c7" stroke-width="2" fill="none"/><path d="${scenarioPath}" stroke="#d66a39" stroke-width="2" stroke-dasharray="5 3" fill="none"/>`;
   if (low < 0)
     svg += `<line x1="${left}" x2="${right}" y1="${y(0)}" y2="${y(0)}" stroke="#c5a38d" stroke-dasharray="2 3"/>`;
   for (const day of [
@@ -402,7 +404,7 @@ function renderCashChart() {
     horizon,
   ]) {
     const d = addDays(r.asOf, day);
-    svg += `<text x="${left + (day / horizon) * (right - left)}" y="207" text-anchor="${day === 0 ? "start" : day === horizon ? "end" : "middle"}" fill="#6b785f" font-size="9">${date(d)}</text>`;
+    svg += `<text x="${left + (day / horizon) * (right - left)}" y="207" text-anchor="${day === 0 ? "start" : day === horizon ? "end" : "middle"}" fill="#67758a" font-size="9">${date(d)}</text>`;
   }
   $("cash-chart").innerHTML = svg;
   chartIndex = Math.min(chartIndex, points.length - 1);
@@ -475,12 +477,12 @@ function renderScenario() {
   for (let i = 0; i < 4; i++) {
     const v = (max * i) / 3,
       y = bottom - ((bottom - top) * v) / max;
-    svg += `<line x1="${left}" x2="${right}" y1="${y}" y2="${y}" stroke="#eef1e8"/><text x="4" y="${y + 3}" fill="#6b785f" font-size="9">${Math.round(v / 1e5)} mil</text>`;
+    svg += `<line x1="${left}" x2="${right}" y1="${y}" y2="${y}" stroke="#eef1e8"/><text x="4" y="${y + 3}" fill="#67758a" font-size="9">${Math.round(v / 1e5)} mil</text>`;
   }
   months.forEach((m, i) => {
     const x = left + (i + 0.5) * step,
       width = Math.min(32, step * 0.2);
-    svg += `<rect x="${x - width - 3}" y="${bottom - (m.base / max) * (bottom - top)}" width="${width}" height="${(m.base / max) * (bottom - top)}" rx="2" fill="#a7bda0"><title>Base ${money(m.base / 100)}</title></rect><rect x="${x + 3}" y="${bottom - (m.scenario / max) * (bottom - top)}" width="${width}" height="${(m.scenario / max) * (bottom - top)}" rx="2" fill="#bd6a4d"><title>Cenário ${money(m.scenario / 100)}</title></rect><text x="${x}" y="223" text-anchor="middle" fill="#6b785f" font-size="10">${new Intl.DateTimeFormat("pt-BR", { month: "short", year: "2-digit", timeZone: "UTC" }).format(new Date(m.month + "-15T12:00:00Z"))}</text>`;
+    svg += `<rect x="${x - width - 3}" y="${bottom - (m.base / max) * (bottom - top)}" width="${width}" height="${(m.base / max) * (bottom - top)}" rx="2" fill="#a7bda0"><title>Base ${money(m.base / 100)}</title></rect><rect x="${x + 3}" y="${bottom - (m.scenario / max) * (bottom - top)}" width="${width}" height="${(m.scenario / max) * (bottom - top)}" rx="2" fill="#bd6a4d"><title>Cenário ${money(m.scenario / 100)}</title></rect><text x="${x}" y="223" text-anchor="middle" fill="#67758a" font-size="10">${new Intl.DateTimeFormat("pt-BR", { month: "short", year: "2-digit", timeZone: "UTC" }).format(new Date(m.month + "-15T12:00:00Z"))}</text>`;
   });
   svg +=
     '<text x="575" y="12" fill="#819574" font-size="9">■ Base</text><text x="650" y="12" fill="#b16649" font-size="9">■ Cenário</text>';
@@ -991,3 +993,20 @@ function renderGlobal() {
   document.querySelectorAll('[data-global-open]').forEach(b=>b.onclick=()=>openOperation(b.dataset.globalOpen));
   if($('clear-country'))$('clear-country').onclick=()=>{selectedCountry='';renderGlobal();};
 }
+
+let selectedCashDate = null;
+function renderLiquidityDesk(){
+ const input={operations,rates,asOf:demo.asOf,openingCashBrl:openingCash,receipts,horizon};
+ const boundary=liquidityBoundary(input),ladder=paymentLadder(result);
+ $('desk-headline').textContent=result.firstShortfall?'O caixa rompe em '+date(result.firstShortfall)+'.':'A carteira cabe no caixa projetado.';
+ $('desk-subtitle').textContent=result.firstShortfall?'Investigue os pagamentos da data e o efeito das premissas de recebimento.':'Compare os cenários antes de assumir novos compromissos. A projeção depende das premissas informadas.';
+ $('desk-boundary').innerHTML=boundary.status==='already_short'?'<span>CAPACIDADE NO CENÁRIO-BASE</span><strong>Déficit já existente</strong><small>Mesmo sem choque cambial adicional.</small>':boundary.status==='not_reached'?'<span>LIMITE DE ESTRESSE TESTADO</span><strong>Até +20%</strong><small>Sem déficit sob choque paralelo nas três moedas.</small>':`<span>PRIMEIRO DÉFICIT SOB ESTRESSE</span><strong>+${(boundary.shock*100).toFixed(2)}%</strong><small>Choque paralelo USD / EUR / GBP. Busca determinística, não probabilidade.</small>`;
+ if(!ladder.some(d=>d.date===selectedCashDate))selectedCashDate=result.firstShortfall||ladder[0]?.date;
+ const max=Math.max(1,...ladder.map(d=>d.scenarioCents));
+ $('payment-ladder').innerHTML=ladder.map(day=>`<button class="ladder-event ${day.date===selectedCashDate?'selected':''} ${day.scenarioBalanceCents<0?'short':''}" data-cash-date="${day.date}"><span class="ladder-date">${date(day.date)}<small>${day.operations.length} operação(ões)</small></span><span class="ladder-bar"><i style="width:${100*day.scenarioCents/max}%"></i></span><span class="ladder-amount">${money(day.scenarioCents/100)}<small>saldo ${money(day.scenarioBalanceCents/100)}</small></span></button>`).join('')||'<p>Nenhum pagamento no horizonte selecionado.</p>';
+ const day=ladder.find(d=>d.date===selectedCashDate);
+ $('event-inspector').innerHTML=day?`<div class="eyebrow">EVENTO SELECIONADO</div><h2>${date(day.date)}</h2><div class="inspector-balance ${day.scenarioBalanceCents<0?'negative':''}">${money(day.scenarioBalanceCents/100)}<small>saldo após os movimentos do dia</small></div><dl><div><dt>Recebimentos previstos</dt><dd>+${money(day.inflowCents/100)}</dd></div><div><dt>Pagamentos do dia</dt><dd>−${money(day.scenarioCents/100)}</dd></div><div><dt>Efeito cambial no dia</dt><dd>${money((day.scenarioCents-day.baselineCents)/100)}</dd></div></dl><h3>Origem das saídas</h3>${day.operations.map(row=>`<button class="inspector-operation" data-cash-open="${esc(row.id)}"><span>${esc(row.supplier)}<small>${esc(row.country||'Origem não informada')} · ${row.currency} · ${esc(row.id)}</small></span><b>${money(row.scenarioCents/100)} ↗</b></button>`).join('')}<p class="inspector-note">Saldo diário líquido. Recebimentos e pagamentos na mesma data são compensados; não há ordem intradiária presumida.</p>`:'<h2>Sem evento no período</h2><p>Amplie o horizonte ou adicione operações.</p>';
+ document.querySelectorAll('[data-cash-date]').forEach(b=>b.onclick=()=>{selectedCashDate=b.dataset.cashDate;renderLiquidityDesk();});
+ document.querySelectorAll('[data-cash-open]').forEach(b=>b.onclick=()=>openOperation(b.dataset.cashOpen));
+}
+document.querySelectorAll('[data-desk]').forEach(button=>button.onclick=()=>{document.querySelectorAll('[data-desk]').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button));});document.querySelectorAll('[data-panel]').forEach(p=>p.hidden=p.dataset.panel!==button.dataset.desk);});

@@ -9,7 +9,7 @@
       content="RiskLab Trade: exposição cambial, operações de importação e fluxo de caixa. Carteira demonstrativa brasileira e referências diárias BCB."
     />
     <title>RiskLab Trade · Exposição e caixa</title>
-    <link rel="stylesheet" href="./trade.css" />
+    <link rel="stylesheet" href="./trade.css" /><link rel="stylesheet" href="./workspace.css" />
   </head>
   <body>
     <a class="skip" href="#content">Ir para o conteúdo</a>
@@ -108,48 +108,12 @@
           class="view active"
           aria-label="Visão geral"
         >
-          <section class="global-desk" aria-label="Carteira internacional"><div class="global-intro"><div><div class="eyebrow">RISKLAB / GLOBAL EXPOSURE</div><h2>Uma carteira.<br>Múltiplas fronteiras.</h2><p>Investigue o risco por origem, vencimento e moeda de faturamento.</p></div><div id="global-summary"></div></div><div class="global-layout"><div><div class="global-toolbar"><h3>Origens da carteira</h3><label>Ordenar <select id="country-sort"><option value="exposure">Exposição</option><option value="cost">Custo total</option><option value="name">Nome do país</option></select></label><label>País <select id="country-filter"><option value="">Todos os países</option></select></label></div><div id="country-grid"></div></div><aside id="country-detail" aria-live="polite"></aside></div><p class="global-disclosure">Operações e fornecedores fictícios. País do fornecedor não determina a moeda do contrato: esta demonstração usa USD, EUR e GBP. Não representa preços internacionais, sanções, elegibilidade comercial ou avaliação geopolítica.</p></section>
-          <article
-            id="investigation"
-            class="investigation"
-            aria-label="Investigação guiada da carteira"
-          >
-            <div>
-              <div class="eyebrow">COMECE POR UMA DECISÃO</div>
-              <h2>
-                Se o dólar subir 10%, qual pagamento pressiona o caixa primeiro?
-              </h2>
-            </div>
-            <p id="investigation-summary">
-              Calculando o efeito sobre os vencimentos…
-            </p>
-            <button class="button" id="investigate-usd" disabled>
-              Investigar o cenário →
-            </button>
-          </article>
-          <section class="risk-workbench" aria-label="Diagnóstico de risco"><header><div class="eyebrow">ANÁLISE / CARTEIRA ATUAL</div><h2>Onde o risco se concentra</h2><p>Explore os choques e descubra quais compromissos explicam a variação.</p></header><div id="risk-diagnostics"></div></section>
-          <div class="metrics" id="overview-metrics">
+<div class="desk-switch" role="group" aria-label="Área de análise"><button class="active" data-desk="liquidity" aria-pressed="true">01 Liquidez e vencimentos</button><button data-desk="global" aria-pressed="false">02 Carteira internacional</button><button data-desk="stress" aria-pressed="false">03 Testes de estresse</button></div>
+<div class="desk-panel" data-panel="liquidity"><section class="decision-header"><div><div class="eyebrow">DIAGNÓSTICO DA CARTEIRA</div><h2 id="desk-headline">Calculando capacidade de caixa…</h2><p id="desk-subtitle"></p></div><div id="desk-boundary" class="boundary"></div></section>          <div class="metrics" id="overview-metrics">
             <div class="skeleton">Preparando a carteira…</div>
           </div>
           <div id="decision-strip" class="decision-strip"></div>
-          <div class="overview-grid">
-            <article class="card operations-card">
-              <div class="card-header">
-                <div>
-                  <div class="eyebrow">01 / COMPROMISSOS</div>
-                  <h2>Agenda de pagamentos</h2>
-                </div>
-                <a href="#operations" class="text-link"
-                  >Ver todas as operações <span>→</span></a
-                >
-              </div>
-              <div class="table-scroll" id="priority-table"></div>
-              <div class="table-footer">
-                Prioridade: vencidas primeiro, depois vencimento mais próximo.
-                Custos incluem principal e estimativas locais.
-              </div>
-            </article>
-            <article class="card cash-card">
+<div class="liquidity-workspace"><div class="liquidity-main">            <article class="card cash-card">
               <div class="card-header">
                 <div>
                   <div class="eyebrow">02 / PROJEÇÃO</div>
@@ -185,6 +149,44 @@
                 >
               </div>
               <p id="cash-note" class="chart-note"></p>
+            </article>
+<section class="ladder-section"><header><div><div class="eyebrow">SAÍDAS PROGRAMADAS</div><h2>Calendário de pressão</h2></div><span>Clique no evento para rastrear os pagamentos</span></header><div id="payment-ladder"></div></section></div><aside class="event-inspector" id="event-inspector" aria-live="polite"></aside></div></div>
+<div class="desk-panel" data-panel="global" hidden>          <section class="global-desk" aria-label="Carteira internacional"><div class="global-intro"><div><div class="eyebrow">RISKLAB / GLOBAL EXPOSURE</div><h2>Uma carteira.<br>Múltiplas fronteiras.</h2><p>Investigue o risco por origem, vencimento e moeda de faturamento.</p></div><div id="global-summary"></div></div><div class="global-layout"><div><div class="global-toolbar"><h3>Origens da carteira</h3><label>Ordenar <select id="country-sort"><option value="exposure">Exposição</option><option value="cost">Custo total</option><option value="name">Nome do país</option></select></label><label>País <select id="country-filter"><option value="">Todos os países</option></select></label></div><div id="country-grid"></div></div><aside id="country-detail" aria-live="polite"></aside></div><p class="global-disclosure">Operações e fornecedores fictícios. País do fornecedor não determina a moeda do contrato: esta demonstração usa USD, EUR e GBP. Não representa preços internacionais, sanções, elegibilidade comercial ou avaliação geopolítica.</p></section>
+</div><div class="desk-panel" data-panel="stress" hidden>          <section class="risk-workbench" aria-label="Diagnóstico de risco"><header><div class="eyebrow">ANÁLISE / CARTEIRA ATUAL</div><h2>Onde o risco se concentra</h2><p>Explore os choques e descubra quais compromissos explicam a variação.</p></header><div id="risk-diagnostics"></div></section>
+          <article
+            id="investigation"
+            class="investigation"
+            aria-label="Investigação guiada da carteira"
+          >
+            <div>
+              <div class="eyebrow">COMECE POR UMA DECISÃO</div>
+              <h2>
+                Se o dólar subir 10%, qual pagamento pressiona o caixa primeiro?
+              </h2>
+            </div>
+            <p id="investigation-summary">
+              Calculando o efeito sobre os vencimentos…
+            </p>
+            <button class="button" id="investigate-usd" disabled>
+              Investigar o cenário →
+            </button>
+          </article>
+</div>          <div class="overview-grid">
+            <article class="card operations-card">
+              <div class="card-header">
+                <div>
+                  <div class="eyebrow">01 / COMPROMISSOS</div>
+                  <h2>Agenda de pagamentos</h2>
+                </div>
+                <a href="#operations" class="text-link"
+                  >Ver todas as operações <span>→</span></a
+                >
+              </div>
+              <div class="table-scroll" id="priority-table"></div>
+              <div class="table-footer">
+                Prioridade: vencidas primeiro, depois vencimento mais próximo.
+                Custos incluem principal e estimativas locais.
+              </div>
             </article>
             <article class="card exposure-card">
               <div class="card-header">
