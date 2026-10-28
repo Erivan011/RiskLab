@@ -76,7 +76,7 @@ npm run build
 npm run validate
 ```
 
-Os 66 testes JavaScript verificam estresse combinado, aporte intermediário com saldo final positivo, recebimentos anteriores à data-base, atribuição sequencial e reconciliação, além de proteção parcial/completa, exclusão de pagos, conservação de centavos e caixa, vencidos, corte de horizonte, pagamentos e recebimentos na mesma data, rejeição de CSV inválido e escape de fórmulas. A pesquisa mantém testes de ausência de vazamento temporal e comparação com a implementação Python.
+Os 77 testes JavaScript verificam estresse combinado, aporte intermediário com saldo final positivo, recebimentos anteriores à data-base, atribuição sequencial e reconciliação, além de proteção parcial/completa, exclusão de pagos, conservação de centavos e caixa, vencidos, corte de horizonte, pagamentos e recebimentos na mesma data, rejeição de CSV inválido e escape de fórmulas. A pesquisa mantém testes de ausência de vazamento temporal e comparação com a implementação Python.
 
 Detalhes de decisões e limitações: [docs/DECISIONS.md](docs/DECISIONS.md). Código sob licença MIT.
 
@@ -105,3 +105,37 @@ Há cinco categorias: índices internacionais, ações brasileiras, empresas int
 O RiskLab não extrai o conteúdo do iframe, não redistribui seus valores por API e não injeta essas cotações na carteira histórica. A integração envia ao provedor símbolos, tema, idioma e metadados normais de incorporação, sem os valores da carteira. O HTML independente também exige conexão para carregar esse painel externo.
 
 Referências do fornecedor: https://www.tradingview.com/widget-docs/widgets/watchlists/market-overview/ e https://www.tradingview.com/widget-docs/faq/data/ .
+
+## Diagnóstico e backtesting de carteira
+
+Abra `/analytics.html`, também acessível pela navegação editorial em **Risco & backtest**. O laboratório mantém o tema do site e permite configurar pesos comprados, capital inicial, referência, janela de treinamento, datas, nível de confiança, política de rebalanceamento e custo proporcional ao giro.
+
+- Diagnóstico: volatilidade anualizada, VaR e ES históricos de um dia, contribuições de Euler à volatilidade, contribuições ao ES nas mesmas datas de cauda, correlação e queda máxima. Contribuições negativas são mantidas.
+- Cenários: choques independentes por ativo, queda conjunta hipotética e reaplicação do pior dia efetivamente observado em conjunto na janela. Não há probabilidade atribuída ao cenário.
+- Backtesting: previsão cronológica sem dados do dia previsto no treinamento, comparação patrimonial com referência comum, custos de rebalanceamento, excedências de VaR e teste de Kupiec. O teste usa retornos brutos; a curva patrimonial desconta custos.
+- Relatório: prévia completa com gráficos e conclusões calculadas, impressão para PDF, exportação HTML, memória JSON com entradas para reprodução e CSV diário com as fronteiras de treinamento.
+- CSV: até 12 colunas de preços, 5.001 linhas de preços e 2 MB. Todos os preços devem estar na mesma moeda-base e com ajustes corporativos consistentes; a aplicação não faz esses ajustes. Linhas incompletas são excluídas e registradas, sem forward fill. Arquivos permanecem no navegador.
+
+O conjunto inicial usa 2.507 retornos de USD/BRL, EUR/BRL e GBP/BRL de 2016–2025, atribuídos ao BCB/SGS e sujeitos à ODbL. É uma exposição sintética cambial sem juros, não uma carteira de ações ou série de retorno total de títulos. Outros ativos e referências podem ser estudados por CSV. Não extraímos preços históricos dos widgets do TradingView.
+
+### Componentes e verificação independente
+
+| Componente | Papel |
+| --- | --- |
+| `web/portfolio-analytics.mjs` | Motor puro para 2–12 ativos, janelas passadas, posições, giro, custos, risco e cenários |
+| `web/portfolio-worker.mjs` | Execução em módulo Worker; fallback local quando indisponível |
+| `web/analytics-app.mjs` | Configuração, validação, importação, execução e relatório |
+| `web/analytics-viz.mjs` | Figuras e tabelas compartilhadas pela tela e pelo relatório |
+| `web/analytics-report.mjs` | Relatório HTML imprimível e exportações JSON/CSV |
+| `analysis/scripts/portfolio_reference.py` | Referência independente NumPy, geração do fixture e persistência opcional em SQLite |
+| `analysis/sql/portfolio_backtest.sql` | Consulta executável de drawdown, taxas de exceção, custos e vazamento temporal |
+
+Os testes comparam **1.508 previsões diárias** e dois caminhos patrimoniais com NumPy, além de testar ausência de uso do futuro, atribuições aditivas com compensações negativas, cobrança sobre ambos os lados do giro, perda inicial no drawdown, limites de cobertura, validação de CSV e escape de nomes importados nos relatórios.
+
+```sh
+python3 analysis/scripts/portfolio_reference.py --sqlite portfolio.db
+sqlite3 portfolio.db < analysis/sql/portfolio_backtest.sql
+npm test
+```
+
+Custos de entrada/saída, impostos, juros, aluguel, liquidez, spreads variáveis, alavancagem e posições vendidas não são modelados. O benchmark de um ativo é passivo; 1/N é rebalanceado diariamente, sem custos. Os resultados descrevem a amostra e os parâmetros definidos; não são recomendação de investimento, previsão garantida ou validação regulatória.

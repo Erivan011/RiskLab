@@ -1,3 +1,4 @@
+import "./build-analytics.mjs";
 import "./build-editorial.mjs";
 import { readFile, writeFile, mkdir, readdir, rm } from "node:fs/promises";
 import path from "node:path";

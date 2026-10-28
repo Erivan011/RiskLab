@@ -21,3 +21,10 @@
 @media print{.market-widget-host,.market-category-tabs,.market-provider-line{display:none}.market-disclosure:before{content:'Painel de cotações disponível somente na versão online. '}}
 
 .market-load-error{position:absolute;inset:0;background:var(--paper);color:var(--muted);display:flex;align-items:center;justify-content:center;padding:35px;text-align:center;font:12px/1.8 var(--mono)}
+
+.analytics-entry{display:flex;align-items:center;gap:26px;border-top:1px solid var(--line);margin-top:25px;padding-top:22px}.analytics-entry>span{font:8px/1.8 var(--mono);letter-spacing:1px;color:var(--muted);max-width:110px}.analytics-entry h3{font:23px var(--serif);margin:0 0 7px}.analytics-entry p{font-size:11px;color:var(--muted);margin:0;line-height:1.8}.analytics-entry a{font:10px/1.8 var(--mono);color:var(--risk);white-space:nowrap;margin-left:auto}.folio nav{gap:18px}
+@media(max-width:700px){.folio nav .analytics-link{display:inline!important}.folio nav a:nth-child(5){display:none}.analytics-entry{display:block}.analytics-entry>span{display:block;max-width:none;margin-bottom:9px}.analytics-entry h3{font-size:25px}.analytics-entry p{font-size:11px}.analytics-entry a{display:inline-block;margin-top:15px}.folio nav{gap:11px}.folio nav a{font-size:9px}.folio .theme-toggle{font-size:8px;padding:7px}.folio .wordmark{font-size:22px}}
+@media(max-width:390px){.folio nav .markets-link{display:none!important}}
+
+@media(max-width:700px){.editorial-page .folio nav a{display:none!important}.editorial-page .folio nav .markets-link,.editorial-page .folio nav .analytics-link{display:inline!important}}
+@media(max-width:390px){.editorial-page .folio nav .markets-link{display:none!important}}
