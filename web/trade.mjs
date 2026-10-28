@@ -1,3 +1,4 @@
+import { renderTreasury } from "./treasury-view.mjs";
 import { liquidityBoundary, paymentLadder } from "./liquidity-analysis.mjs";
 import { verifyJavaPrice } from "./java-pricing.mjs";
 import {
@@ -66,8 +67,8 @@ let shocks = { USD: 0, EUR: 0, GBP: 0 },
 const viewNames = {
   overview: [
     "Visão geral",
-    "Controle de liquidez internacional",
-    "Da obrigação ao caixa: identifique o evento, investigue a causa e compare o efeito.",
+    "Risco, do contrato ao caixa",
+    "Investigue a exposição. Teste o caixa. Rastreie cada resultado.",
   ],
   operations: [
     "Operações",
@@ -210,6 +211,10 @@ function render() {
   renderDiagnostics();
   renderGlobal();
   renderLiquidityDesk();
+  renderTreasury({operations,rates,asOf:demo.asOf,openingCashBrl:openingCash,receipts,horizon}, referenceDates, openOperation, supplier => {
+    $("search").value=supplier; $("filter-currency").value="all"; $("filter-status").value="all";
+    location.hash="operations"; renderOperations();
+  });
   $("currency-exposure").innerHTML = r.currencies
     .map((c, i) => {
       const principal = r.rows

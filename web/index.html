@@ -48,10 +48,10 @@
     <header class="mastbar">
       <a class="brand" href="#overview" aria-label="RiskLab Trade início"
         ><span class="brand-mark">R<span>↗</span></span
-        ><span>risklab<small>TRADE DESK</small></span></a
+        ><span>risklab<small>TREASURY LAB</small></span></a
       >
       <nav aria-label="Navegação principal">
-        <a href="#overview" data-view="overview" class="active">Visão geral</a>
+        <a href="#overview" data-view="overview" class="active">Sala de análise</a>
         <a href="#operations" data-view="operations"
           >Operações <span id="nav-count">—</span></a
         >
@@ -62,7 +62,7 @@
         <span class="workspace-avatar">AC</span>
         <div>
           Aurora Componentes<small
-            >Carteira demonstrativa · Campinas / SP</small
+            >Caso demonstrativo · Campinas / SP</small
           >
         </div>
       </div>
@@ -108,8 +108,8 @@
           class="view active"
           aria-label="Visão geral"
         >
-<div class="desk-switch" role="group" aria-label="Área de análise"><button class="active" data-desk="liquidity" aria-pressed="true">01 Liquidez e vencimentos</button><button data-desk="global" aria-pressed="false">02 Carteira internacional</button><button data-desk="stress" aria-pressed="false">03 Testes de estresse</button></div>
-<div class="desk-panel" data-panel="liquidity"><section class="decision-header"><div><div class="eyebrow">DIAGNÓSTICO DA CARTEIRA</div><h2 id="desk-headline">Calculando capacidade de caixa…</h2><p id="desk-subtitle"></p></div><div id="desk-boundary" class="boundary"></div></section>          <div class="metrics" id="overview-metrics">
+<div class="desk-switch" role="group" aria-label="Área de análise"><button class="active" data-desk="briefing" aria-pressed="true">Sala de análise</button><button data-desk="liquidity" aria-pressed="false">Fluxos e vencimentos</button><button data-desk="global" aria-pressed="false">Origens da carteira</button><button data-desk="stress" aria-pressed="false">Sensibilidade cambial</button></div>
+<div class="desk-panel" data-panel="briefing"><div id="treasury-workbench"></div></div><div class="desk-panel" data-panel="liquidity" hidden><section class="decision-header"><div><div class="eyebrow">DIAGNÓSTICO DA CARTEIRA</div><h2 id="desk-headline">Calculando capacidade de caixa…</h2><p id="desk-subtitle"></p></div><div id="desk-boundary" class="boundary"></div></section>          <div class="metrics" id="overview-metrics">
             <div class="skeleton">Preparando a carteira…</div>
           </div>
           <div id="decision-strip" class="decision-strip"></div>

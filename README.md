@@ -2,7 +2,7 @@
 
 Um workspace de tesouraria para investigar como o câmbio altera o custo e o caixa de uma importadora brasileira. Parte de uma obrigação identificável — fornecedor, moeda, orçamento, vencimento e parcela protegida — em vez de indicadores financeiros sem contexto operacional.
 
-**Demonstração:** https://risklab-erivan.citrusjoy10.chatgpt.site (acesso privado da conta proprietária).
+**Demonstração:** https://risklab-erivan.citrusjoy10.chatgpt.site (acesso público).
 
 A Aurora Componentes, seus fornecedores e fluxos são fictícios. As referências cambiais são séries diárias BCB/SGS, identificadas por data e limitadas à data-base da demonstração. Não há execução de pagamentos, negociação ou recomendação de investimento.
 
@@ -20,11 +20,13 @@ Abra `http://localhost:4173`. Não abra o HTML por duplo clique. O build gera o 
 
 ## Fluxo de análise
 
-1. Confira compromissos em aberto, desvio do orçamento e parcela descoberta.
-2. Investigue vencimentos e o saldo acumulado de caixa em 30, 60 ou 90 dias.
-3. Abra uma operação para conferir as premissas e editar sua proteção, taxa fixa ou situação.
-4. Aplique choques independentes por moeda e compare custos por vencimento.
-5. Registre cenários localmente ou exporte a carteira em CSV.
+1. Comece na Sala de análise: combine alta cambial, atraso e redução dos recebimentos. A matriz cruza 20 cenários e mostra o aporte mínimo para evitar saldos diários negativos.
+2. Confira a decomposição sequencial do estresse e exporte a memória de cálculo JSON com entradas, referências e ledger diário.
+3. Confira compromissos em aberto, desvio do orçamento e parcela descoberta.
+4. Investigue vencimentos e o saldo acumulado de caixa em 30, 60 ou 90 dias.
+5. Abra uma operação para conferir as premissas e editar sua proteção, taxa fixa ou situação.
+6. Aplique choques independentes por moeda e compare custos por vencimento.
+7. Registre cenários localmente ou exporte a carteira em CSV.
 
 A importação valida até 500 operações antes de substituir qualquer dado. Caixa inicial e recebimentos são premissas separadas, editáveis na interface. Operações marcadas como pagas não entram na projeção.
 
@@ -40,6 +42,8 @@ flowchart TD
 
 | Componente | Responsabilidade |
 | --- | --- |
+| `web/treasury-engine.mjs` | Estresse combinado, aporte mínimo, reconciliação e concentração por contraparte |
+| `web/treasury-view.mjs` | Sala de análise, superfície interativa de sensibilidade e relatório reproduzível |
 | `web/trade-engine.mjs` | Validação de operações, conversão, centavos, maturidades e conservação do caixa |
 | `web/trade-csv.mjs` | Parsing CSV, contrato de colunas e exportação com proteção contra fórmulas |
 | `web/trade.mjs` | Estado do workspace, telas, detalhe de operação e persistência local |
@@ -60,7 +64,7 @@ A versão de pesquisa continua em `/research.html`. Consulte [docs/RESEARCH.md](
 
 ## Dados, privacidade e limites
 
-O CSV e os valores de operações são processados no navegador. O servidor recebe apenas consultas de referências públicas. O workspace, cenários e uma trilha local de até 25 mudanças ficam no `localStorage`, sem sincronização entre dispositivos ou garantia de auditoria regulatória.
+O CSV e os valores de operações são processados no navegador. O servidor recebe consultas de referências públicas. A conferência opcional no motor Java envia somente os parâmetros da operação escolhida (moeda, valor, referência, cobertura, taxa fixa, custo local e choque), por um proxy para a API de demonstração na Render; não envia o nome do fornecedor ou a carteira inteira. O workspace, cenários e uma trilha local de até 25 mudanças ficam no `localStorage`, sem sincronização entre dispositivos ou garantia de auditoria regulatória.
 
 A demonstração tem data-base fixa em 27/10/2026. A atualização consulta a fonte, mas não usa preços posteriores à data-base; um snapshot é explicitamente identificado. Atribuição e licença dos dados BCB: [analysis/DATA_LICENSE.md](analysis/DATA_LICENSE.md).
 
@@ -72,6 +76,6 @@ npm run build
 npm run validate
 ```
 
-Os testes verificam proteção parcial/completa, exclusão de pagos, conservação de centavos e caixa, vencidos, corte de horizonte, pagamentos e recebimentos na mesma data, rejeição de CSV inválido e escape de fórmulas. A pesquisa mantém testes de ausência de vazamento temporal e comparação com a implementação Python.
+Os 59 testes JavaScript verificam estresse combinado, aporte intermediário com saldo final positivo, recebimentos anteriores à data-base, atribuição sequencial e reconciliação, além de proteção parcial/completa, exclusão de pagos, conservação de centavos e caixa, vencidos, corte de horizonte, pagamentos e recebimentos na mesma data, rejeição de CSV inválido e escape de fórmulas. A pesquisa mantém testes de ausência de vazamento temporal e comparação com a implementação Python.
 
 Detalhes de decisões e limitações: [docs/DECISIONS.md](docs/DECISIONS.md). Código sob licença MIT.
