@@ -76,7 +76,7 @@ npm run build
 npm run validate
 ```
 
-Os 64 testes JavaScript verificam estresse combinado, aporte intermediário com saldo final positivo, recebimentos anteriores à data-base, atribuição sequencial e reconciliação, além de proteção parcial/completa, exclusão de pagos, conservação de centavos e caixa, vencidos, corte de horizonte, pagamentos e recebimentos na mesma data, rejeição de CSV inválido e escape de fórmulas. A pesquisa mantém testes de ausência de vazamento temporal e comparação com a implementação Python.
+Os 66 testes JavaScript verificam estresse combinado, aporte intermediário com saldo final positivo, recebimentos anteriores à data-base, atribuição sequencial e reconciliação, além de proteção parcial/completa, exclusão de pagos, conservação de centavos e caixa, vencidos, corte de horizonte, pagamentos e recebimentos na mesma data, rejeição de CSV inválido e escape de fórmulas. A pesquisa mantém testes de ausência de vazamento temporal e comparação com a implementação Python.
 
 Detalhes de decisões e limitações: [docs/DECISIONS.md](docs/DECISIONS.md). Código sob licença MIT.
 
@@ -95,3 +95,13 @@ A página principal serve HTML pré-preenchido, `web/editorial.css` e módulos J
 - `prefers-reduced-motion` desativa transições e reprodução automática; o slider manual continua disponível. Sem bibliotecas de animação ou dependências novas.
 
 A abertura calcula o caixa no navegador em JavaScript. A API Java 17/BigDecimal é uma conferência opcional no workspace de operações; Python e SQL pertencem à trilha quantitativa de pesquisa. Não há banco SQL conectado ao editorial.
+
+### Mercados globais
+
+A seção `#mercados` incorpora o widget Market Overview do TradingView, sem chave de API. `global-market-config.mjs` contém somente categorias e símbolos públicos autorizados pela aplicação; `global-markets.mjs` gerencia carregamento próximo à área visível, troca de categoria/tema, timeout, fallback e nova tentativa manual. O fornecedor mantém o controle sobre a disponibilidade de cada símbolo.
+
+Há cinco categorias: índices internacionais, ações brasileiras, empresas internacionais listadas nos EUA, pares cambiais e cripto. CFDs e ADRs são identificados. O widget pode exibir cotação em tempo real, com atraso ou de fechamento, conforme o instrumento e a licença da bolsa. O painel e a atribuição do TradingView permanecem visíveis.
+
+O RiskLab não extrai o conteúdo do iframe, não redistribui seus valores por API e não injeta essas cotações na carteira histórica. A integração envia ao provedor símbolos, tema, idioma e metadados normais de incorporação, sem os valores da carteira. O HTML independente também exige conexão para carregar esse painel externo.
+
+Referências do fornecedor: https://www.tradingview.com/widget-docs/widgets/watchlists/market-overview/ e https://www.tradingview.com/widget-docs/faq/data/ .
