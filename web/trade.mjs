@@ -998,8 +998,8 @@ let selectedCashDate = null;
 function renderLiquidityDesk(){
  const input={operations,rates,asOf:demo.asOf,openingCashBrl:openingCash,receipts,horizon};
  const boundary=liquidityBoundary(input),ladder=paymentLadder(result);
- $('desk-headline').textContent=result.firstShortfall?'O caixa rompe em '+date(result.firstShortfall)+'.':'A carteira cabe no caixa projetado.';
- $('desk-subtitle').textContent=result.firstShortfall?'Investigue os pagamentos da data e o efeito das premissas de recebimento.':'Compare os cenários antes de assumir novos compromissos. A projeção depende das premissas informadas.';
+ $('desk-headline').textContent=result.firstShortfall?'Primeiro saldo negativo projetado: '+date(result.firstShortfall):'Saldo projetado positivo no horizonte.';
+ $('desk-subtitle').textContent=result.firstShortfall?'Consulte os compromissos da data e as premissas de recebimento que compõem a projeção.':'Compare os cenários antes de assumir novos compromissos. A projeção depende das premissas informadas.';
  $('desk-boundary').innerHTML=boundary.status==='already_short'?'<span>CAPACIDADE NO CENÁRIO-BASE</span><strong>Déficit já existente</strong><small>Mesmo sem choque cambial adicional.</small>':boundary.status==='not_reached'?'<span>LIMITE DE ESTRESSE TESTADO</span><strong>Até +20%</strong><small>Sem déficit sob choque paralelo nas três moedas.</small>':`<span>PRIMEIRO DÉFICIT SOB ESTRESSE</span><strong>+${(boundary.shock*100).toFixed(2)}%</strong><small>Choque paralelo USD / EUR / GBP. Busca determinística, não probabilidade.</small>`;
  if(!ladder.some(d=>d.date===selectedCashDate))selectedCashDate=result.firstShortfall||ladder[0]?.date;
  const max=Math.max(1,...ladder.map(d=>d.scenarioCents));
