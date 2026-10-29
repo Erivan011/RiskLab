@@ -2,6 +2,7 @@ import dataset from '../../web/purchase-research.json';
 import report from '../../web/terminal-quant-report.json';
 import {slice,selectRows,suppliers,orders,cutoff} from './data.mjs';
 import {Quant} from './Quant';
+import {Pipeline} from './Pipeline';
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   Activity,
@@ -684,7 +685,7 @@ export default function App() {
             )}
 
             {/* ABA 5: ARQUITETURA POLIGLOTA (SQLITE EXPLAIN QUERY PLAN & JAVA PARITY) */}
-            {activeTab === 'sql_java_parity' && <section className="grid lg:grid-cols-2 gap-6 animate-panel"><div className="bg-[#161A22] p-5 rounded border border-[#262B36] space-y-3"><h2>Pipeline Python → SQLite → React</h2><p className="text-xs text-[#8B949E]">Pedidos inteiramente sintéticos, reproduzíveis por semente. Importação idempotente com validação e identificação de alterações.</p><pre className="text-xs whitespace-pre-wrap font-mono text-[#C4A982]">{JSON.stringify(dataset.run,null,2)}</pre></div><div className="bg-[#161A22] p-5 rounded border border-[#262B36] space-y-4"><h2>Rastreabilidade e código aberto</h2><p className="text-xs text-[#8B949E]">A cascata executa as 24 permutações dos quatro fatores no recorte selecionado. O arredondamento monetário é incluído em composição. Resíduo atual: R$ {currentSlice.residual.toFixed(8)}.</p><p className="text-xs text-[#8B949E]">O relatório quantitativo é gerado em Python com janela anterior a cada previsão. Java possui uma implementação de referência; a interface não afirma execução ou paridade com um servidor Java.</p><a className="text-[#C4A982] underline" href="https://github.com/Erivan011/RiskLab" target="_blank" rel="noreferrer">Abrir código e documentação ↗</a><a className="block underline text-xs" href="/data-explorer.html">Explorador estatístico ↗</a><a className="block underline text-xs" href="/editorial.html">Mesa de câmbio e caixa ↗</a></div></section>}
+            {activeTab === 'sql_java_parity' && <Pipeline data={dataset} residual={currentSlice.residual}/>}
             <p className="text-[11px] text-[#8B949E]">{dataset.disclosure} Corte {dataset.asOf}. Relatório BCB: {report.asOf}. Resultados materializados, sem promessa de tempo real. {currentSlice.cumOrders===0?'Nenhum pedido corresponde aos filtros.':''}</p>
           </main>
         </div>
