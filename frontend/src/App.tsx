@@ -498,7 +498,7 @@ export default function App() {
                         <CartesianGrid strokeDasharray="3 3" stroke="#262B36" vertical={false} />
                         <XAxis dataKey="etapa" stroke="#8B949E" fontSize={11} tickLine={false} />
                         <YAxis stroke="#8B949E" fontSize={11} tickLine={false} domain={[0, 'auto']} />
-                        <Tooltip
+                        <Tooltip itemStyle={{color:"#E5E5DC"}} labelStyle={{color:"#C4A982"}}
                           contentStyle={{ backgroundColor: '#12151B', borderColor: '#262B36', fontSize: '12px', color: '#FFFFFF', fontFamily: 'monospace' }}
                           formatter={(val: any, name: string) => {
                             if (name === 'BaseInvisivel') return [null, null];
@@ -540,7 +540,7 @@ export default function App() {
                         <CartesianGrid strokeDasharray="3 3" stroke="#262B36" vertical={false} />
                         <XAxis dataKey="mes" stroke="#8B949E" fontSize={11} tickLine={false} />
                         <YAxis stroke="#8B949E" fontSize={11} tickLine={false} />
-                        <Tooltip
+                        <Tooltip itemStyle={{color:"#E5E5DC"}} labelStyle={{color:"#C4A982"}}
                           contentStyle={{ backgroundColor: '#12151B', borderColor: '#262B36', fontSize: '12px', color: '#FFFFFF', fontFamily: 'monospace' }}
                         />
                         <Legend wrapperStyle={{ fontSize: '11px', color: '#8B949E' }} />
