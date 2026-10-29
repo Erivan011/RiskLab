@@ -286,3 +286,20 @@ os visuais interpolam da geometria renderizada anterior para a nova, por chaves
 estáveis, sem reiniciar todos os gráficos de zero. O motor de cálculo é independente
 do movimento. O controle “Movimento” respeita a preferência de redução do sistema
 por padrão e permite ativação explícita, persistida no navegador.
+
+### Terminal React integrado (V4)
+
+A entrada pública usa agora `frontend/src/App.tsx`, a partir do TSX de referência:
+React + TypeScript, Recharts, Tailwind e Lucide, preservando a composição, os
+contadores interpolados, curvas/barras animadas, replay, busca e drawer.
+`frontend/src/data.mjs` conecta os recortes ao motor Shapley/Wilson existente,
+com corte de observação para entregas e pagamentos; pedidos continuam sintéticos.
+O backtest e a volatilidade usam `web/terminal-quant-report.json`, materializado
+pelo pipeline Python. Não há selo de aprovação regulatória nem paridade Java
+alegada sem execução. O cenário FX é uma hipótese explícita de neutralização,
+não uma otimização de hedge executável. Os relatórios não são tempo real.
+
+Para reproduzir: Node 24, `npm ci --include=dev`, `npm test`, `npm run validate`.
+O build gera os assets React e os incorpora ao mesmo Worker/servidor Node.
+O build existente do Render instala as dependências pelo lockfile caso ausentes.
+As interfaces anteriores seguem acessíveis pelas URLs específicas.

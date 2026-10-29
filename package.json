@@ -4,13 +4,25 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/dev-server.mjs",
-    "build": "node scripts/build-site.mjs",
+    "build": "node scripts/build-terminal.mjs && node scripts/build-site.mjs",
     "test": "node --test tests/*.test.mjs",
     "validate": "node scripts/validate-artifact.mjs",
-    "pretest": "npm run build"
+    "pretest": "npm run build",
+    "prebuild": "node scripts/ensure-build-deps.mjs"
   },
   "version": "1.0.0",
   "engines": {
     "node": ">=24"
+  },
+  "dependencies": {
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "lucide-react": "1.31.0",
+    "recharts": "3.8.0"
+  },
+  "devDependencies": {
+    "vite": "8.0.13",
+    "tailwindcss": "4.2.1",
+    "@tailwindcss/postcss": "4.2.1"
   }
 }

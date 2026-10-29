@@ -10,3 +10,9 @@ worker/index.js
 dist/
 
 java-risk/out/
+
+node_modules/
+web/terminal-react.*
+web/terminal.html
+web/react-build/
+node_modules
