@@ -12,31 +12,38 @@ AS_OF = date(2026, 10, 28)
 SEED = 202610
 CATEGORIES = ['Sensores', 'Conectores', 'Placas', 'Instrumentação']
 SUPPLIERS = ['Kanto', 'Nordwerk', 'Han River', 'Lumière', 'Pacific', 'Bristol', 'Torino', 'Alpine']
-FX = {'USD': 5.2, 'EUR': 6.0, 'GBP': 7.0}
+# Synthetic planning assumptions (BRL per currency unit), not market quotations.
+FX = {'BRL':1.0,'USD':5.2,'EUR':6.0,'GBP':7.0,'CNY':0.75,'JPY':0.036,'CHF':6.4,'CAD':3.8,'AUD':3.45,'INR':0.064}
+DRIFT = {'BRL':0,'USD':0.012,'EUR':0.004,'GBP':0.006,'CNY':-0.003,'JPY':-0.006,'CHF':0.005,'CAD':0.002,'AUD':-0.002,'INR':0.0015}
+COUNTRIES = ['Japão','Alemanha','Coreia do Sul','França','Estados Unidos','Reino Unido','Itália','Suíça',
+             'Brasil','China','Canadá','Austrália','Índia','México','Espanha','Países Baixos','Suécia','Singapura','Rússia','Chile']
+SUPPLIERS += ['Aurora Brasil','Shenzhen Components','Maple Circuits','Southern Sensors','Bharat Parts','Monterrey Supply',
+              'Iberia Controls','Delta Instruments','Nordic Devices','Straits Components','Volga Optics','Andes Parts']
+SKU_COUNT = 40
 
 
 def generate():
     rng = random.Random(SEED)
     rows = []
     for month in range(1, 11):
-        for sku in range(24):
-            currency = ['USD', 'EUR', 'GBP'][sku % 3]
+        for sku in range(SKU_COUNT):
+            currency = list(FX)[sku % len(FX)]
             category = CATEGORIES[sku % 4]
-            supplier = SUPPLIERS[sku % 8]
+            supplier = SUPPLIERS[sku % len(SUPPLIERS)]
             for batch in range(2):
                 order = date(2026, month, 2+batch*12+sku%6)
                 if order > AS_OF:
                     continue
-                supplier_index = (sku + batch + month//3) % 8
+                supplier_index = (sku + batch + month*3) % len(SUPPLIERS)
                 supplier = SUPPLIERS[supplier_index]
                 planned = round((24+sku*2)*(1+.18*month/10)*(1+.12*(month in [3,6,9])))
                 # Documented mechanisms, not patterns learned from real businesses.
                 volume_factor = 1+.08*(month>=7)+.12*(sku%4==2 and month>=6)
                 quantity = max(1, round(planned*volume_factor*rng.uniform(.88,1.12)))
-                budget_price = round(8+sku*.9, 2)
+                budget_price = round((40+sku*3)/FX[currency], 4)
                 actual_price = round(budget_price*(1+.045*(supplier_index==2)+.035*(month>=7)-.02*(supplier_index==5))*rng.uniform(.98,1.02), 4)
                 budget_fx = FX[currency]
-                invoice_fx = round(budget_fx*(1+.012*month+.025*(currency=='USD' and month>=8)), 4)
+                invoice_fx = 1.0 if currency=='BRL' else round(budget_fx*(1+DRIFT[currency]*month+.025*(currency=='USD' and month>=8)), 6)
                 promised = order+timedelta(days=10+sku%8)
                 delay = max(-3, round(rng.gauss(-3+9*(supplier_index==2)+3*(month>=7), 4)))
                 delivery = promised+timedelta(days=delay)
@@ -50,7 +57,7 @@ def generate():
                     dueDate=due.isoformat(),paidDate=paid.isoformat() if paid else None,
                     budgetQty=planned,actualQty=quantity,budgetPrice=budget_price,actualPrice=actual_price,
                     budgetFx=budget_fx,actualFx=invoice_fx,
-                    budgetBrl=round(planned*budget_price*budget_fx,2),actualBrl=round(quantity*actual_price*invoice_fx,2)))
+                    budgetBrl=round(planned*budget_price*budget_fx,2),actualBrl=round(quantity*actual_price*invoice_fx,2),country=COUNTRIES[supplier_index]))
     return rows
 
 
@@ -70,13 +77,17 @@ def run(output, database):
         existing_columns={r[1] for r in db.execute('PRAGMA table_info(fact_purchase)')}
         if 'row_sha256' not in existing_columns:
             db.execute('ALTER TABLE fact_purchase ADD COLUMN row_sha256 TEXT')
+        if 'country' not in existing_columns:
+            db.execute('ALTER TABLE fact_purchase ADD COLUMN country TEXT')
+        db.execute('CREATE INDEX IF NOT EXISTS idx_purchase_country_currency_order ON fact_purchase(country,currency,order_date)')
         db.execute('CREATE INDEX IF NOT EXISTS idx_purchase_supplier_currency_order ON fact_purchase(supplier,currency,order_date)')
-        fields=[r[1] for r in db.execute('PRAGMA table_info(fact_purchase)')]
-        columns=list(rows[0])
+        row_fields=list(rows[0])
+        db_fields=['id','sku','category','supplier','currency','order_date','promised_date','delivery_date','due_date','paid_date',
+                   'budget_qty','actual_qty','budget_price','actual_price','budget_fx','actual_fx','budget_brl','actual_brl','country','row_sha256']
         changes_before=db.total_changes
-        update_fields=','.join(f'{field}=excluded.{field}' for field in fields if field!='id')
-        db.executemany('INSERT INTO fact_purchase VALUES('+','.join('?' for _ in fields)+') ON CONFLICT(id) DO UPDATE SET '+update_fields+' WHERE fact_purchase.row_sha256 IS NOT excluded.row_sha256',
-          [tuple(r[k] for k in columns)+(hashlib.sha256(json.dumps(r,sort_keys=True).encode()).hexdigest(),) for r in rows])
+        update_fields=','.join(f'{field}=excluded.{field}' for field in db_fields if field!='id')
+        db.executemany('INSERT INTO fact_purchase ('+','.join(db_fields)+') VALUES('+','.join('?' for _ in db_fields)+') ON CONFLICT(id) DO UPDATE SET '+update_fields+' WHERE fact_purchase.row_sha256 IS NOT excluded.row_sha256',
+          [tuple(r[k] for k in row_fields)+(hashlib.sha256(json.dumps(r,sort_keys=True).encode()).hexdigest(),) for r in rows])
         changed=db.total_changes-changes_before
         query_plan=[r[-1] for r in db.execute('EXPLAIN QUERY PLAN SELECT SUM(actual_brl) FROM fact_purchase WHERE supplier=? AND currency=? AND order_date>=?',('Han River','USD','2026-01-01'))]
         executed = datetime.now(timezone.utc).isoformat()
@@ -86,9 +97,11 @@ def run(output, database):
           FROM fact_purchase GROUP BY 1 ORDER BY 1''')]
         suppliers=[dict(supplier=s,orders=n,actualBrl=a) for s,n,a in db.execute('''
           SELECT supplier,COUNT(*),ROUND(SUM(actual_brl),2) FROM fact_purchase GROUP BY 1 ORDER BY 3 DESC''')]
-    report = {'schemaVersion':1,'asOf':AS_OF.isoformat(),'sourceKind':'synthetic','seed':SEED,
+    report = {'schemaVersion':2,'asOf':AS_OF.isoformat(),'sourceKind':'synthetic','seed':SEED,
       'disclosure':'Todos os pedidos, valores, preços, câmbio faturado, fornecedores, pagamentos e entregas desta área são sintéticos. Não são dados de uma empresa real nem cotações BCB.',
-      'generationRules':['24 SKUs, 8 fornecedores, 4 categorias e 3 moedas; duas remessas por mês de janeiro a outubro de 2026.',
+      'currencies':list(FX),'countries':COUNTRIES,'planningFxBrlPerUnit':FX,
+      'generationRules':['40 SKUs, 20 fornecedores/países, 4 categorias e 10 moedas; duas remessas por mês de janeiro a outubro de 2026.',
+       'País é atributo do fornecedor; moeda é atributo do pedido. Valores cambiais são premissas sintéticas, não cotações. BRL permanece 1:1.',
        'Volume aumenta a partir de julho; placas têm aumento adicional a partir de junho.',
        'Han River tem atraso médio simulado maior; variações são geradas com semente fixa.',
        'Entregas e pagamentos posteriores à data de corte são nulos e tratados como pendentes, nunca como pontuais.'],

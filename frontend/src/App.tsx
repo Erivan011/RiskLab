@@ -1,8 +1,9 @@
 import dataset from '../../web/purchase-research.json';
 import report from '../../web/terminal-quant-report.json';
-import {slice,selectRows,suppliers,orders,cutoff} from './data.mjs';
+import {slice,selectRows,suppliers,orders,cutoff,costBridge} from './data.mjs';
 import {Quant} from './Quant';
 import {Pipeline} from './Pipeline';
+import {GlobalExposure} from './GlobalExposure';
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   Activity,
@@ -101,6 +102,7 @@ interface SupplierRecord {
 }
 
 interface PurchaseOrderDetail {
+  country: string;
   poId: string;
   supplier: string;
   category: string;
@@ -136,7 +138,7 @@ interface MonthlySlice {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'basel_backtest' | 'ndf_carry_garch' | 'suppliers_orders' | 'sql_java_parity'
+    'global' | 'overview' | 'basel_backtest' | 'ndf_carry_garch' | 'suppliers_orders' | 'sql_java_parity'
   >('overview');
 
   // Player Temporal (Jan–Out/2026)
@@ -147,6 +149,7 @@ export default function App() {
 
   // Filtros Sóbrios + Cross-Filtering + Slide-Over Drawer + Command Palette (Ctrl+K)
   const [currencyFilter, setCurrencyFilter] = useState<string>('ALL');
+  const [countryFilter,setCountryFilter]=useState('ALL');
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [crossFilteredSupplier, setCrossFilteredSupplier] = useState<string>('ALL');
   const [drawerOrder, setDrawerOrder] = useState<PurchaseOrderDetail | null>(null);
@@ -189,7 +192,7 @@ export default function App() {
     return () => clearInterval(timer);
   }, [isPlayingTimeline]);
 
-  const scope=useMemo(()=>({currency:currencyFilter==='ALL'?'':currencyFilter,category:categoryFilter==='ALL'?'':categoryFilter,supplier:crossFilteredSupplier==='ALL'?'':crossFilteredSupplier}),[currencyFilter,categoryFilter,crossFilteredSupplier]);
+  const scope=useMemo(()=>({currency:currencyFilter==='ALL'?'':currencyFilter,category:categoryFilter==='ALL'?'':categoryFilter,supplier:crossFilteredSupplier==='ALL'?'':crossFilteredSupplier,country:countryFilter==='ALL'?'':countryFilter}),[currencyFilter,categoryFilter,crossFilteredSupplier,countryFilter]);
   useEffect(()=>setOrderLimit(30),[timelineIdx,scope]);
   const currentSlice=useMemo(()=>slice(dataset,timelineIdx,scope),[timelineIdx,scope]);
   const filteredSuppliers=useMemo(()=>suppliers(dataset,timelineIdx,scope),[timelineIdx,scope]);
@@ -209,27 +212,14 @@ export default function App() {
     const adjOverdue = currentSlice.overdueBrl;
 
     // Paridade Coberta de Juros B3 (63 dias úteis) — igual ao risk.py e Exposure.java
-    const spotPtax = report.currencies.USD.spot;
+    const spotPtax = report.currencies[currencyFilter]?.spot??report.currencies.USD.spot;
     const fatorCdi = Math.pow(1 + cdiRatePct / 100, 63 / 252);
     const fatorCupom = 1 + (sofrCupomPct / 100) * (90 / 360);
     const forwardNdfRate = Number((spotPtax * (fatorCdi / fatorCupom)).toFixed(4));
     const forwardPoints = Number((forwardNdfRate - spotPtax).toFixed(4));
     const carryCostBrl = Math.round(130000 * forwardPoints);
 
-    const b0 = currentSlice.cumBudget;
-    const b1 = b0 + adjFx;
-    const b2 = b1 + currentSlice.volEffect;
-    const b3 = b2 + currentSlice.priceEffect;
-    const b4 = b3 + currentSlice.mixEffect;
-
-    const waterfallBridge = [
-      { etapa: 'Orçamento', BaseInvisivel: 0, Delta: b0, Tipo: 'TOTAL' },
-      { etapa: '+ Câmbio', BaseInvisivel: b0, Delta: adjFx, Tipo: 'SAND' },
-      { etapa: '+ Volume', BaseInvisivel: b1, Delta: currentSlice.volEffect, Tipo: 'SLATE' },
-      { etapa: '+ Preço', BaseInvisivel: b2, Delta: currentSlice.priceEffect, Tipo: 'SAND' },
-      { etapa: 'Composição', BaseInvisivel: Math.min(b3,b4), Delta: Math.abs(currentSlice.mixEffect), Tipo: 'MUTED' },
-      { etapa: 'Realizado', BaseInvisivel: 0, Delta: b4, Tipo: 'TOTAL' }
-    ];
+    const waterfallBridge=costBridge({budget:currentSlice.cumBudget,fx:adjFx,volume:currentSlice.volEffect,price:currentSlice.priceEffect,mix:currentSlice.mixEffect});
 
     return {
       adjBilled,
@@ -245,7 +235,7 @@ export default function App() {
       carryCostBrl,
       waterfallBridge
     };
-  }, [currentSlice, hedgeRatioPct, hanRiverMigrationPct, cdiRatePct, sofrCupomPct]);
+  }, [currentSlice, hedgeRatioPct, hanRiverMigrationPct, cdiRatePct, sofrCupomPct, currencyFilter]);
 
   const animBilled = Math.round(useSmoothCounter(computedMetrics.adjBilled, 420, pulseTrigger));
   const animVariance = Math.round(useSmoothCounter(computedMetrics.adjVariance, 420, pulseTrigger));
@@ -253,6 +243,7 @@ export default function App() {
   const animOverdue = Math.round(useSmoothCounter(computedMetrics.adjOverdue, 420, pulseTrigger));
 
   const commandActions = [
+    {label:'Ir para: Países & moedas',run:()=>setActiveTab('global')},
     { label: 'Ir para: Backtest cronológico (Kupiec + Christoffersen)', run: () => setActiveTab('basel_backtest') },
     { label: 'Ir para: Otimizador de Hedge NDF (CDI vs. SOFR) & GARCH(1,1)', run: () => setActiveTab('ndf_carry_garch') },
     { label: 'Ir para: Paridade Poliglota (Python vs. Java Exposure.java & SQL Plan)', run: () => setActiveTab('sql_java_parity') },
@@ -327,7 +318,8 @@ export default function App() {
                   { id: 'basel_backtest', label: '2. Backtest cronológico (Kupiec)', sub: 'Cornish-Fisher + t-Student ES' },
                   { id: 'ndf_carry_garch', label: '3. Hedge NDF (CDI) & GARCH(1,1)', sub: 'Juros manuais + Volatilidade' },
                   { id: 'suppliers_orders', label: '4. Fornecedores & Raio-X PO', sub: 'Cross-filter + Gaveta lateral' },
-                  { id: 'sql_java_parity', label: '5. Pipeline & Rastreabilidade', sub: 'Python · SQLite · React · Java' }
+                  { id: 'global', label: '5. Países & moedas', sub: 'Concentração + Matriz de origens' },
+                  { id: 'sql_java_parity', label: '6. Pipeline & Rastreabilidade', sub: 'Python · SQLite · React · Java' }
                 ].map((tab) => {
                   const active = activeTab === tab.id;
                   return (
@@ -417,6 +409,7 @@ export default function App() {
                     setHanRiverMigrationPct(0);
                     setCurrencyFilter('ALL');
                     setCategoryFilter('ALL');
+                    setCountryFilter('ALL');
                     setCrossFilteredSupplier('ALL');
                     setTimelineIdx(10);
                     setIsPlayingTimeline(false);
@@ -431,7 +424,8 @@ export default function App() {
           </header>
 
           <div className="bg-[#12151B] px-6 py-3 flex flex-wrap gap-4 items-center text-xs border-b border-[#262B36]">
-            <label>Moeda <select aria-label="Moeda" className="bg-[#161A22] border border-[#343B4A] p-2 rounded" value={currencyFilter} onChange={e=>setCurrencyFilter(e.target.value)}><option value="ALL">Todas</option>{['USD','EUR','BRL'].map(x=><option key={x}>{x}</option>)}</select></label>
+            <label>Moeda <select aria-label="Moeda" className="bg-[#161A22] border border-[#343B4A] p-2 rounded" value={currencyFilter} onChange={e=>setCurrencyFilter(e.target.value)}><option value="ALL">Todas</option>{[...new Set(dataset.rows.map(r=>r.currency))].sort().map(x=><option key={x}>{x}</option>)}</select></label>
+            <label>País de origem <select aria-label="País de origem" className="bg-[#161A22] border border-[#343B4A] p-2 rounded" value={countryFilter} onChange={e=>setCountryFilter(e.target.value)}><option value="ALL">Todos</option>{[...new Set(dataset.rows.map(r=>r.country))].sort().map(x=><option key={x}>{x}</option>)}</select></label>
             <label>Categoria <select aria-label="Categoria" className="bg-[#161A22] border border-[#343B4A] p-2 rounded" value={categoryFilter} onChange={e=>setCategoryFilter(e.target.value)}><option value="ALL">Todas</option>{[...new Set(dataset.rows.map(r=>r.category))].map(x=><option key={x}>{x}</option>)}</select></label>
             <label className="flex gap-2 items-center">Corte mensal <input aria-label="Corte mensal" type="range" min="1" max="10" value={timelineIdx} onChange={e=>{setIsPlayingTimeline(false);setTimelineIdx(Number(e.target.value));}} className="accent-[#C4A982]"/>{currentSlice.label}</label>
             <a className="text-[#C4A982] underline" href="/purchase-research.json" download>Base JSON ↓</a>
@@ -443,7 +437,7 @@ export default function App() {
               <div className="bg-[#161A22] border border-[#262B36] rounded-[8px] p-4">
                 <div className="text-xs text-[#8B949E] mb-1">Compras faturadas</div>
                 <div className="text-2xl font-bold font-mono text-[#FFFFFF]">
-                  R$ {animBilled.toLocaleString('pt-BR')}
+                  {currentSlice.cumOrders?`R$ ${animBilled.toLocaleString('pt-BR')}`:'Sem dados'}
                 </div>
                 <div className="text-[11px] font-mono text-[#8B949E] mt-1.5">
                   Orçamento: R$ {currentSlice.cumBudget.toLocaleString('pt-BR')}
@@ -453,7 +447,7 @@ export default function App() {
               <div className="bg-[#161A22] border border-[#262B36] rounded-[8px] p-4">
                 <div className="text-xs text-[#8B949E] mb-1">Desvio contra orçamento</div>
                 <div className="text-2xl font-bold font-mono text-[#C4A982]">
-                  R$ {animVariance.toLocaleString('pt-BR')}{' '}
+                  {currentSlice.cumOrders?`R$ ${animVariance.toLocaleString('pt-BR')}`:'Sem dados'}{' '}
                   <span className="text-sm font-normal text-[#A0A8B6]">({computedMetrics.adjVariancePct}%)</span>
                 </div>
                 <div className="text-[11px] font-mono text-[#8B949E] mt-1.5">
@@ -464,17 +458,17 @@ export default function App() {
               <div className="bg-[#161A22] border border-[#262B36] rounded-[8px] p-4">
                 <div className="text-xs text-[#8B949E] mb-1">Entrega pontual (Wilson 95%)</div>
                 <div className="text-2xl font-bold font-mono text-[#FFFFFF]">
-                  {animOnTime.toFixed(1)}%
+                  {currentSlice.deliveredCount?animOnTime.toFixed(1)+'%':'Sem desfecho'}
                 </div>
                 <div className="text-[11px] font-mono text-[#8B949E] mt-1.5">
-                  {currentSlice.cumOrders} pedidos no recorte · entregas observadas no corte
+                  {currentSlice.onTimeCount} pontuais / {currentSlice.deliveredCount} entregues · {currentSlice.cumOrders} pedidos
                 </div>
               </div>
 
               <div className="bg-[#161A22] border border-[#262B36] rounded-[8px] p-4">
                 <div className="text-xs text-[#8B949E] mb-1">Pagamentos vencidos em aberto</div>
                 <div className="text-2xl font-bold font-mono text-[#C4A982]">
-                  R$ {animOverdue.toLocaleString('pt-BR')}
+                  {currentSlice.cumOrders?`R$ ${animOverdue.toLocaleString('pt-BR')}`:'Sem dados'}
                 </div>
                 <div className="text-[11px] font-mono text-[#8B949E] mt-1.5">
                   Saldo sem pagamento observado até o corte
@@ -500,9 +494,9 @@ export default function App() {
                         <YAxis stroke="#8B949E" fontSize={11} tickLine={false} domain={[0, 'auto']} />
                         <Tooltip itemStyle={{color:"#E5E5DC"}} labelStyle={{color:"#C4A982"}}
                           contentStyle={{ backgroundColor: '#12151B', borderColor: '#262B36', fontSize: '12px', color: '#FFFFFF', fontFamily: 'monospace' }}
-                          formatter={(val: any, name: string) => {
+                          formatter={(val: any, name: string, item: any) => {
                             if (name === 'BaseInvisivel') return [null, null];
-                            return [`R$ ${Number(val).toLocaleString('pt-BR')}`, 'Impacto / Nível'];
+                            return [`R$ ${Number(item?.payload?.signed??val).toLocaleString('pt-BR')}`, 'Impacto / Nível'];
                           }}
                         />
                         <Bar dataKey="BaseInvisivel" stackId="wf" fill="transparent" isAnimationActive={false} />
@@ -560,7 +554,7 @@ export default function App() {
             {/* ABA 3: OTIMIZADOR DE HEDGE NDF (CDI vs. CUPOM CAMBIAL B3) & VOLATILIDADE GARCH(1,1) */}
             {activeTab === 'ndf_carry_garch' && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-[#161A22] border border-[#262B36] rounded-[8px] p-5 space-y-5"><h2 className="text-sm font-semibold">Taxa a termo · premissas manuais</h2><p className="text-xs text-[#8B949E]">Ilustração de paridade de juros, não cotação executável de NDF. Spot USD de referência {report.asOf}. Prazo doméstico 63 dias úteis e externo 90 dias corridos.</p><label className="block text-xs">Taxa doméstica anual: {cdiRatePct.toFixed(2)}%<input aria-label="Taxa doméstica anual" className="w-full accent-[#C4A982]" type="range" min="0" max="25" step="0.25" value={cdiRatePct} onChange={e=>setCdiRatePct(Number(e.target.value))}/></label><label className="block text-xs">Taxa externa anual: {sofrCupomPct.toFixed(2)}%<input aria-label="Taxa externa anual" className="w-full accent-[#5B759B]" type="range" min="0" max="15" step="0.01" value={sofrCupomPct} onChange={e=>setSofrCupomPct(Number(e.target.value))}/></label><div className="grid grid-cols-2 gap-4 font-mono"><div><small>Spot de referência</small><p>{computedMetrics.spotPtax.toFixed(4)}</p></div><div><small>Termo ilustrativo</small><p className="text-[#C4A982] text-xl">{computedMetrics.forwardNdfRate.toFixed(4)}</p></div></div><p className="text-xs text-[#8B949E]">F = spot × (1 + doméstica)^(63/252) ÷ (1 + externa × 90/360). Taxa externa não equivale automaticamente ao cupom cambial brasileiro.</p></div>
+                {(currencyFilter==='ALL'||report.currencies[currencyFilter])&&<div className="bg-[#161A22] border border-[#262B36] rounded-[8px] p-5 space-y-5"><h2 className="text-sm font-semibold">Taxa a termo · premissas manuais</h2><p className="text-xs text-[#8B949E]">Ilustração de paridade de juros, não cotação executável de NDF. Spot {currencyFilter==='ALL'?'USD':currencyFilter} de referência {report.asOf}. Prazo doméstico 63 dias úteis e externo 90 dias corridos.</p><label className="block text-xs">Taxa doméstica anual: {cdiRatePct.toFixed(2)}%<input aria-label="Taxa doméstica anual" className="w-full accent-[#C4A982]" type="range" min="0" max="25" step="0.25" value={cdiRatePct} onChange={e=>setCdiRatePct(Number(e.target.value))}/></label><label className="block text-xs">Taxa externa anual: {sofrCupomPct.toFixed(2)}%<input aria-label="Taxa externa anual" className="w-full accent-[#5B759B]" type="range" min="0" max="15" step="0.01" value={sofrCupomPct} onChange={e=>setSofrCupomPct(Number(e.target.value))}/></label><div className="grid grid-cols-2 gap-4 font-mono"><div><small>Spot de referência</small><p>{computedMetrics.spotPtax.toFixed(4)}</p></div><div><small>Termo ilustrativo</small><p className="text-[#C4A982] text-xl">{computedMetrics.forwardNdfRate.toFixed(4)}</p></div></div><p className="text-xs text-[#8B949E]">F = spot × (1 + doméstica)^(63/252) ÷ (1 + externa × 90/360). Taxa externa não equivale automaticamente ao cupom cambial brasileiro.</p></div>}
                 <Quant report={report} currency={currencyFilter} mode="volatility"/>
               </div>
             )}
@@ -605,7 +599,7 @@ export default function App() {
                             >
                               <td className="py-2.5 px-2.5 font-sans">
                                 <span className="font-semibold text-[#FFFFFF]">{s.name}</span>{' '}
-                                <span className="text-[11px] text-[#8B949E]">({s.currency})</span>
+                                <span className="text-[11px] text-[#8B949E]">({s.currency})</span><small className="block text-[#8B949E] mt-1">{s.country}</small>
                               </td>
                               <td className="py-2.5 px-2.5 text-center text-[#A0A8B6]">{s.delivered}/{s.totalOrders}</td>
                               <td className="py-2.5 px-2.5 font-bold text-[#FFFFFF]">{s.delivered?s.onTimePct.toFixed(1)+'%':'Sem desfecho'}</td>
@@ -685,8 +679,9 @@ export default function App() {
             )}
 
             {/* ABA 5: ARQUITETURA POLIGLOTA (SQLITE EXPLAIN QUERY PLAN & JAVA PARITY) */}
+            {activeTab === 'global' && <GlobalExposure data={dataset} month={timelineIdx} scope={scope} onCountry={setCountryFilter} onCurrency={setCurrencyFilter}/>}
             {activeTab === 'sql_java_parity' && <Pipeline data={dataset} residual={currentSlice.residual}/>}
-            <p className="text-[11px] text-[#8B949E]">{dataset.disclosure} Corte {dataset.asOf}. Relatório BCB: {report.asOf}. Resultados materializados, sem promessa de tempo real. {currentSlice.cumOrders===0?'Nenhum pedido corresponde aos filtros.':''}</p>
+            <p className="text-[11px] text-[#8B949E]">{dataset.disclosure} Corte {dataset.asOf}. Relatório BCB: {report.asOf}. Resultados materializados, sem promessa de tempo real. {currentSlice.cumOrders===0?'Nenhum pedido corresponde aos filtros. Ausência de dados não significa ausência de risco.':''}</p>
           </main>
         </div>
       </div>
@@ -718,6 +713,8 @@ export default function App() {
                     <span className="text-[#FFFFFF] font-bold">{drawerOrder.supplier} ({drawerOrder.currency})</span>
                   </div>
                   <div className="flex justify-between">
+                    <span className="text-[#8B949E]">País de origem:</span><span>{drawerOrder.country}</span>
+                  </div><div className="flex justify-between">
                     <span className="text-[#8B949E]">Data do Pedido:</span>
                     <span className="text-[#FFFFFF]">{drawerOrder.orderDate}</span>
                   </div>

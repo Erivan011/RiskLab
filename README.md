@@ -6,7 +6,7 @@ Um terminal interativo para investigar uma pergunta operacional: **por que o cus
 
 [**Abrir demonstração pública ↗**](https://risklab-trade-erivan.onrender.com/)
 
-![Terminal RiskLab: etapas do pipeline, qualidade e reconciliação dos dados](docs/images/risklab-terminal.jpg)
+![Terminal RiskLab: comparação de 10 moedas e análise de 20 países](docs/images/risklab-terminal.jpg)
 
 ## O que explorar
 
@@ -16,9 +16,10 @@ Um terminal interativo para investigar uma pergunta operacional: **por que o cus
 | **Backtest cronológico** | Como os modelos de VaR se comportam fora da janela de treinamento? |
 | **Taxa a termo & volatilidade** | Como as premissas de juros alteram o termo ilustrativo? Como EWMA e GARCH parametrizado se comparam? |
 | **Fornecedores & pedidos** | Onde estão os atrasos e quais pedidos explicam os indicadores? |
+| **Países & moedas** | Qual é a concentração por origem, moeda de pagamento e suas combinações? |
 | **Pipeline & rastreabilidade** | De onde vêm os números, como foram tratados e como conferir sua consistência? |
 
-A interface usa **React, TypeScript, Recharts e Tailwind CSS**, com tema escuro, gráficos animados, contadores interpolados, replay mensal, filtros por moeda e categoria, seleção cruzada por fornecedor, busca por **Ctrl/Cmd + K** e detalhamento lateral dos pedidos. A lista carrega em lotes de 30 registros.
+A interface usa **React, TypeScript, Recharts e Tailwind CSS**, com tema escuro, gráficos animados, contadores interpolados, replay mensal, filtros por moeda, país e categoria, seleção cruzada por fornecedor, busca por **Ctrl/Cmd + K** e detalhamento lateral dos pedidos. A lista carrega em lotes de 30 registros.
 
 O painel de pipeline apresenta as etapas **origem → tratamento → análise**, indicadores de qualidade e reconciliação. Hash, execução incremental e plano SQL ficam disponíveis em **Detalhes de auditoria**.
 
@@ -26,13 +27,29 @@ O painel de pipeline apresenta as etapas **origem → tratamento → análise**,
 
 ### Operações demonstrativas
 
-- **480 pedidos sintéticos**, 24 SKUs, 8 fornecedores e 4 categorias, de janeiro a outubro de 2026; corte em **28/10/2026**.
+- **800 pedidos sintéticos**, 40 SKUs, 20 fornecedores em 20 países, 10 moedas e 4 categorias, de janeiro a outubro de 2026; corte em **28/10/2026**.
 - Geração reproduzível por semente, processamento Python e persistência SQLite com validação, carga incremental e hash SHA-256.
 - Decomposição Shapley de quatro fatores nas **24 permutações**, recalculada para o recorte selecionado. O arredondamento monetário integra a reconciliação.
 - Pontualidade entre pedidos entregues, intervalos de Wilson e investigação de entregas pendentes. O replay respeita o corte de observação de entregas e pagamentos.
 - Pagamentos vencidos são analisados separadamente dos atrasos de entrega.
 
 A Aurora Componentes e as operações são fictícias. Valores, câmbio faturado, fornecedores, entregas e pagamentos dessa base **não representam uma empresa real nem cotações BCB**. Shapley atribui uma diferença contábil entre fatores; não demonstra causalidade.
+
+### Países e moedas
+
+A carteira demonstrativa contém **BRL, USD, EUR, GBP, CNY, JPY, CHF, CAD, AUD e INR**.
+País de origem é atributo do fornecedor; a moeda de pagamento é atributo do pedido.
+Há fornecedores fictícios no Brasil, China, Rússia, França, Estados Unidos, Alemanha,
+Japão, Reino Unido, Coreia do Sul, Itália, Suíça, Canadá, Austrália, Índia, México,
+Espanha, Países Baixos, Suécia, Singapura e Chile.
+
+O módulo compara participação no faturamento, desvio de orçamento, pagamentos em
+aberto e pontualidade, com HHI descritivo e matriz país × moeda. Valores são
+convertidos para BRL antes da comparação. BRL tem conversão fixa 1:1 e efeito FX
+zero, mas suas compras e demais indicadores permanecem ativos. As taxas das
+operações são premissas sintéticas, inclusive nas novas moedas; não são cotações
+oficiais. Relatórios de risco com histórico BCB estão disponíveis apenas para
+USD, EUR e GBP nesta versão. Não são inventados backtests das outras moedas.
 
 ### Experimento quantitativo
 
@@ -44,7 +61,7 @@ O terminal consome um relatório materializado por Python, com referências diá
 - Comparação EWMA e GARCH(1,1) **parametrizado**, sem alegar ajuste por máxima verossimilhança.
 - Taxa a termo ilustrativa com premissas manuais e bases distintas: 63 dias úteis domésticos e 90 dias corridos externos.
 
-O experimento cambial é separado das compras: os filtros de fornecedor/categoria e o replay não alteram silenciosamente o relatório de risco. O filtro de moeda seleciona relatórios disponíveis; quando não há relatório para a seleção, a tela identifica a referência USD usada.
+O experimento cambial é separado das compras: os filtros de fornecedor/categoria e o replay não alteram silenciosamente o relatório de risco. O filtro de moeda seleciona relatórios disponíveis; quando não há relatório para a seleção, a tela informa histórico indisponível, sem substituí-lo por USD. BRL/BRL não tem risco cambial.
 
 **Limites:** os relatórios do terminal não são um feed em tempo real. VaR não é perda máxima; não rejeitar uma hipótese não aprova um modelo. Cornish–Fisher pode ser instável com assimetria/curtose elevadas. A neutralização FX é um cenário hipotético com efetividade assumida, não uma otimização ou cotação executável de hedge. Não há execução de pagamentos, negociação ou recomendação de investimento.
 
@@ -63,7 +80,7 @@ flowchart TD
 
 | Camada | Implementação |
 | --- | --- |
-| Interface | `frontend/src/App.tsx`, `Quant.tsx` e `Pipeline.tsx` |
+| Interface | `frontend/src/App.tsx`, `Quant.tsx`, `GlobalExposure.tsx` e `Pipeline.tsx` |
 | Adaptação e recortes | `frontend/src/data.mjs` |
 | Motor de compras | `web/purchase-engine.mjs` |
 | Pipeline de compras | `analysis/scripts/purchase_pipeline.py` |
@@ -104,7 +121,7 @@ npm run validate
 PYTHONPATH=analysis/src python -m unittest discover -s analysis/tests -v
 ```
 
-A última verificação da integração passou em **109 testes JavaScript**, incluindo reconciliação Shapley, filtros, exclusão de pedidos futuros, censura temporal de entregas e recortes vazios. `npm test` também executa o build. A validação do artefato verifica o módulo de produção e sua exportação `fetch`. A análise Python e a referência Java têm verificações próprias configuradas em CI.
+A última verificação da integração passou em **113 testes JavaScript**, incluindo reconciliação Shapley, filtros, exclusão de pedidos futuros, censura temporal de entregas e recortes vazios. `npm test` também executa o build. A validação do artefato verifica o módulo de produção e sua exportação `fetch`. A análise Python passou em **16 testes**, incluindo migração do schema e repetição idempotente da carga. A referência Java tem verificações próprias configuradas em CI.
 
 Docker está configurado como alternativa: `docker compose up --build web`. Java e Docker não foram executados no ambiente local desta integração.
 

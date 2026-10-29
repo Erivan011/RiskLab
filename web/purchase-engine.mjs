@@ -1,6 +1,6 @@
 const sum=(rows,key)=>rows.reduce((n,r)=>n+r[key],0);
 export function filterPurchases(rows,filter){
- return rows.filter(r=>['currency','category','supplier'].every(k=>!filter[k]||r[k]===filter[k])&&(!filter.from||r.orderDate>=filter.from)&&(!filter.until||r.orderDate<=filter.until));
+ return rows.filter(r=>['currency','category','supplier','country'].every(k=>!filter[k]||r[k]===filter[k])&&(!filter.from||r.orderDate>=filter.from)&&(!filter.until||r.orderDate<=filter.until));
 }
 function vectors(rows,actual){
  const qty=actual?'actualQty':'budgetQty',price=actual?'actualPrice':'budgetPrice',fx=actual?'actualFx':'budgetFx';

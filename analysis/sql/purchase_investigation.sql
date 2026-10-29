@@ -20,3 +20,26 @@ SELECT supplier,COUNT(*) AS orders,SUM(delivered) AS delivered,SUM(on_time) AS o
        SUM(overdue_pending) AS overdue_pending,
        SUM(overdue_pending*actual_brl) AS pending_value_brl
 FROM outcomes GROUP BY supplier ORDER BY pending_value_brl DESC;
+
+-- Country is independent from invoice currency. Values are already in BRL.
+SELECT country,currency,COUNT(*) AS orders,
+       ROUND(SUM(actual_brl),2) AS actual_brl,
+       ROUND(SUM(actual_brl-budget_brl),2) AS variance_brl,
+       ROUND(SUM(CASE WHEN paid_date IS NULL OR paid_date>'2026-10-28'
+         THEN actual_brl ELSE 0 END),2) AS open_brl
+FROM fact_purchase
+WHERE order_date<='2026-10-28'
+GROUP BY country,currency ORDER BY country,actual_brl DESC;
+
+-- HHI of invoiced purchase value, descriptive only (not a risk rating).
+WITH totals AS (
+ SELECT country,SUM(actual_brl) AS amount FROM fact_purchase GROUP BY country
+), shares AS (
+ SELECT country,amount/SUM(amount) OVER () AS share FROM totals
+)
+SELECT ROUND(SUM(share*share)*10000,2) AS country_hhi FROM shares;
+
+-- Domestic invoices retain purchases but must have zero FX variation.
+SELECT COUNT(*) AS brl_orders,ROUND(SUM(actual_brl),2) AS brl_invoiced,
+       SUM(CASE WHEN budget_fx<>1 OR actual_fx<>1 THEN 1 ELSE 0 END) AS invalid_brl_fx
+FROM fact_purchase WHERE currency='BRL';

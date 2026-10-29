@@ -43,9 +43,9 @@ class TerminalV4Tests(unittest.TestCase):
             out=Path(d)/'data.json';db=Path(d)/'data.sqlite'
             module.run(out,db);first=json.loads(out.read_text())
             module.run(out,db);second=json.loads(out.read_text())
-            self.assertEqual(first['run']['changedRows'],480)
+            self.assertEqual(first['run']['changedRows'],800)
             self.assertEqual(second['run']['changedRows'],0)
-            self.assertEqual(second['run']['unchangedRows'],480)
+            self.assertEqual(second['run']['unchangedRows'],800)
             self.assertEqual(first['run']['sha256'],second['run']['sha256'])
             self.assertTrue(any('USING INDEX' in p for p in second['run']['queryPlan']))
 
