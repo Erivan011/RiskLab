@@ -1,0 +1,9 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {decomposeBudget,evaluateVolatility,blockMeanInterval} from '../web/research-engine.mjs';
+const rows=Array.from({length:180},(_,i)=>({date:new Date(Date.UTC(2025,9,1+i)).toISOString().slice(0,10),values:[.01*Math.sin(i),.02*Math.cos(i),.005]}));
+test('decomposition reconciles exactly to mark-versus-budget and exposes offsets',()=>{const r=decomposeBudget([{id:'A',currency:'USD',amount:100,budgetRate:5,hedgePercent:50,hedgeRate:5.5},{id:'B',currency:'USD',amount:100,budgetRate:7,hedgePercent:0,hedgeRate:7}],{USD:6});assert.equal(r.fx,0);assert.equal(r.fixing,-25);assert.equal(r.net,-25);assert.equal(r.positive,75);assert.equal(r.negative,-100);assert.ok(r.offsetShare>0);});
+test('a future mutation cannot change any forecast issued before it',()=>{const base=evaluateVolatility(rows,0);const changed=structuredClone(rows);changed.at(-1).values[0]=.5;const next=evaluateVolatility(changed,0);assert.deepEqual(base.evaluation.map(r=>r.predictions),next.evaluation.map(r=>r.predictions));assert.deepEqual(base.evaluation.map(r=>r.threshold),next.evaluation.map(r=>r.threshold));assert.ok(base.evaluation.every(r=>r.trainingEnd<r.date));});
+test('constant return magnitudes make all model forecasts and errors agree',()=>{const flat=rows.map(r=>({...r,values:[.01,.01,.01]}));const r=evaluateVolatility(flat,0);assert.ok(r.models.every(m=>m.rmse<1e-12));assert.equal(r.alerts.length,0);});
+test('paired bootstrap is reproducible and constant differences have point interval',()=>{assert.deepEqual(blockMeanInterval(Array(80).fill(-2)),[-2,-2]);assert.deepEqual(blockMeanInterval([1,2,3,4,5]),blockMeanInterval([1,2,3,4,5]));});
+test('invalid temporal order and short samples are rejected',()=>{assert.throws(()=>evaluateVolatility(rows.slice(0,50),0));assert.throws(()=>evaluateVolatility([...rows].reverse(),0));});

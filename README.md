@@ -195,3 +195,28 @@ python analysis/scripts/operations_warehouse.py --input web/trade-demo.json --da
 Consultas reconciliáveis: `analysis/sql/operations_bi.sql`. O painel web calcula os
 indicadores a partir do JSON demonstrativo e da API BCB; não afirma consultar um
 warehouse SQL em produção. Trata-se de aplicação web de BI, não arquivo Power BI.
+
+### Investigação de dados: hipóteses e avaliação
+
+A área “Investigação de dados” do BI acrescenta:
+
+- Decomposição exata do desvio de orçamento em efeito de referência cambial e efeito
+  de fixação, expondo compensações que desaparecem no agregado líquido.
+- Avaliação cronológica de variância em 2026: referência congelada nos 60 retornos
+  anteriores, média móvel de 20 e EWMA λ=0,94. Nenhum parâmetro é ajustado no teste.
+- RMSE contra r² e diferença de QLIKE, com intervalo bootstrap circular pareado em
+  blocos de 5, 1.000 repetições e semente 2026. Ranking descritivo, sem alegar
+  validação de seleção ou volatilidade intradiária observada.
+- Alertas por percentil 99 de |retorno| dos 60 registros anteriores, com fronteira
+  temporal por alerta. Sem rótulos não há precisão ou falso-positivo mensurável.
+- JSON de reprodução com retornos, premissas, previsões, limites e fonte.
+
+Referência independente em Python e persistência dos resultados para SQL:
+
+```bash
+python analysis/scripts/volatility_experiment.py --database /tmp/risklab.sqlite --currency USD --csv /tmp/volatility.csv
+```
+
+Execute a ingestão do histórico antes; veja `analysis/sql/volatility_evaluation.sql`.
+A previsão da variância não é previsão da direção do câmbio. O alvo r² é ruidoso,
+a amostra é limitada e o intervalo bootstrap depende da hipótese de blocos.
