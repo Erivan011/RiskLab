@@ -276,3 +276,13 @@ agendada. Java e Docker têm verificações configuradas, mas não foram executa
 ambiente local desta integração, que não tem javac ou Docker. A interface atual
 continua modular em JavaScript; os recursos do TSX foram adaptados aos dados e
 motores do projeto, sem introduzir uma segunda aplicação com métricas divergentes.
+
+### Movimento do terminal
+
+As animações de interação do V4 foram preservadas na aplicação modular: contadores,
+entrada escalonada de painéis, crescimento e transição de barras/bolhas/faixas de
+Wilson, traçado das curvas e abertura do drawer/busca. No replay e nos filtros,
+os visuais interpolam da geometria renderizada anterior para a nova, por chaves
+estáveis, sem reiniciar todos os gráficos de zero. O motor de cálculo é independente
+do movimento. O controle “Movimento” respeita a preferência de redução do sistema
+por padrão e permite ativação explícita, persistida no navegador.

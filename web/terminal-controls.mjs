@@ -1,3 +1,4 @@
+import {motionEnabled} from './workspace-motion.mjs';
 import {commandMatches} from './terminal-state.mjs';
 export function installTerminalControls({navigate,replay,reset,onReplayState}){
  const commands=[
@@ -20,9 +21,9 @@ export function installTerminalControls({navigate,replay,reset,onReplayState}){
  input.onkeydown=e=>{if(['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();selected=(selected+(e.key==='ArrowDown'?1:-1)+Math.max(1,matches.length))%Math.max(1,matches.length);renderResults();}if(e.key==='Enter'&&matches[selected]){e.preventDefault();dialog.close();matches[selected].run();}};
  document.getElementById('command-open').onclick=open;
  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();dialog.open?dialog.close():open();}});
- function stop(){clearInterval(timer);timer=null;button.textContent='▷ Reproduzir';button.setAttribute('aria-pressed','false');onReplayState?.(false);}
+ function stop(){clearInterval(timer);timer=null;button.textContent='▷ Reproduzir';button.setAttribute('aria-pressed','false');document.body.classList.remove('replay-running');onReplayState?.(false);}
  function update(value){month=value;slider.value=value;label.textContent=new Intl.DateTimeFormat('pt-BR',{month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(Date.UTC(2026,value-1,1)));replay(value);}
- function play(){if(timer){stop();return;}if(matchMedia('(prefers-reduced-motion: reduce)').matches){label.textContent='Movimento reduzido: use o controle mensal.';return;}if(month>=10)update(1);button.textContent='Ⅱ Pausar';button.setAttribute('aria-pressed','true');onReplayState?.(true);timer=setInterval(()=>{if(month>=10){stop();return;}update(month+1);if(month===10)stop();},1100);}
+ function play(){if(timer){stop();return;}if(!motionEnabled()){label.textContent='Movimento reduzido: use o controle mensal.';return;}if(month>=10)update(1);button.textContent='Ⅱ Pausar';button.setAttribute('aria-pressed','true');document.body.classList.add('replay-running');onReplayState?.(true);timer=setInterval(()=>{if(month>=10){stop();return;}update(month+1);if(month===10)stop();},1100);}
  slider.oninput=()=>{stop();update(Number(slider.value));};button.onclick=play;
  document.getElementById('replay-all').onclick=()=>{stop();update(10);};
  document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
