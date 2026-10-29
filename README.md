@@ -151,3 +151,9 @@ O laboratório consulta `/api/market` ao abrir, a cada 15 minutos quando visíve
 Para renovar o snapshot offline antes de publicar: `node scripts/refresh-market.mjs`, seguido de `npm test`. A atualização normal do site não depende de nova publicação. A memória JSON e o relatório registram a consulta, estado da fonte, séries e data de cada moeda.
 
 A raiz do site e `/index.html` abrem diretamente o laboratório com a barra de configurações. A mesa de câmbio permanece em `/editorial.html`; cotações globais em `/editorial.html#mercados`.
+
+### Laboratório probabilístico de liquidez
+
+A página editorial inclui bootstrap histórico pareado de retornos USD/EUR/GBP de 2026, consultados no BCB. São 1.000 caminhos por hipótese de cobertura (0/50/100%), calculados em Web Worker, com semente reproduzível, percentis diários, probabilidade de déficit e aporte no percentil 95. O custo de proteção é hipotético e configurável. A exportação JSON contém dados de entrada, metadados da fonte e resultados. O backtest existente permanece em `analytics.html`; não confundir sua validação de VaR com validação prospectiva desta projeção de caixa.
+
+O bootstrap mantém correlação contemporânea, mas supõe retornos diários independentes ao longo do tempo; não prevê eleições, crises ou mudanças de regime. Carteira e recebimentos são demonstrativos. Consulte as premissas junto ao gráfico.

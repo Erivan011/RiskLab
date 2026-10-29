@@ -1,3 +1,4 @@
+import {installCashLab} from './cash-lab.mjs';
 import {installGlobalMarkets} from './global-markets.mjs';
 import {animateMoney,animateProfile,installChartProbe,startEditorialMotion,installPlayback,installReadingProgress} from './editorial-motion.mjs';
 import {editorialState,formatBrl,answerMarkup,profileSvg,waterfallSvg,driversMarkup,hedgeMarkup,heatmapMarkup,chartDescription} from './editorial-model.mjs';
@@ -46,3 +47,5 @@ installPlayback(value=>{activeShock=value/100;ui('usd-shock').value=value;render
 installReadingProgress();
 
 installGlobalMarkets();
+
+installCashLab(INPUT);
