@@ -157,3 +157,22 @@ A raiz do site e `/index.html` abrem diretamente o laboratório com a barra de c
 A página editorial inclui bootstrap histórico pareado de retornos USD/EUR/GBP de 2026, consultados no BCB. São 1.000 caminhos por hipótese de cobertura (0/50/100%), calculados em Web Worker, com semente reproduzível, percentis diários, probabilidade de déficit e aporte no percentil 95. O custo de proteção é hipotético e configurável. A exportação JSON contém dados de entrada, metadados da fonte e resultados. O backtest existente permanece em `analytics.html`; não confundir sua validação de VaR com validação prospectiva desta projeção de caixa.
 
 O bootstrap mantém correlação contemporânea, mas supõe retornos diários independentes ao longo do tempo; não prevê eleições, crises ou mudanças de regime. Carteira e recebimentos são demonstrativos. Consulte as premissas junto ao gráfico.
+
+### Exploração e qualidade dos dados
+
+`data-explorer.html` consulta a API existente e apresenta distribuição, correlação,
+maiores quedas e auditoria do payload recebido. Não confunde datas ausentes na união
+das séries com feriados nem afirma auditar registros já descartados pela API.
+
+O pipeline incremental Python/SQLite pode ser reproduzido sem dependências extras:
+
+```bash
+python analysis/scripts/market_warehouse.py --input web/market-snapshot.json --database /tmp/risklab.sqlite
+# Ou usar a API publicada como origem:
+python analysis/scripts/market_warehouse.py --url https://risklab-trade-erivan.onrender.com/api/market --database /tmp/risklab.sqlite
+```
+
+Cada execução registra hash SHA-256, contagens de qualidade e quantidade de preços
+inseridos/revisados. Uma carga idêntica não altera as cotações, mas cria novo registro
+de execução. Consultas: `analysis/sql/market_quality.sql`. O warehouse não é um
+serviço Python residente nem uma tarefa agendada; o explorador usa a API ao abrir.
