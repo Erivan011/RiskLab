@@ -2,7 +2,7 @@
 
 Um workspace de tesouraria para investigar como o câmbio altera o custo e o caixa de uma importadora brasileira. Parte de uma obrigação identificável — fornecedor, moeda, orçamento, vencimento e parcela protegida — em vez de indicadores financeiros sem contexto operacional.
 
-**Demonstração:** https://risklab-erivan.citrusjoy10.chatgpt.site (acesso público).
+**Demonstração:** https://risklab-trade-erivan.onrender.com (acesso público).
 
 A Aurora Componentes, seus fornecedores e fluxos são fictícios. As referências cambiais são séries diárias BCB/SGS, identificadas por data e limitadas à data-base da demonstração. Não há execução de pagamentos, negociação ou recomendação de investimento.
 
