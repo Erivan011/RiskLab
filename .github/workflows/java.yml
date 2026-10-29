@@ -15,3 +15,4 @@ jobs:
           java-version: '17'
       - run: mkdir -p java-risk/out && javac -d java-risk/out java-risk/src/risklab/*.java
       - run: java -cp java-risk/out risklab.ExposureTest
+      - run: java -cp java-risk/out risklab.ForwardIllustrationTest

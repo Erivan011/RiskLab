@@ -61,16 +61,24 @@ def run(output, database):
     payload_hash = hashlib.sha256(json.dumps(rows,sort_keys=True).encode()).hexdigest()
     db = sqlite3.connect(database)
     with db:
-        db.executescript('''DROP TABLE IF EXISTS fact_purchase;
-        CREATE TABLE fact_purchase(id TEXT PRIMARY KEY, sku TEXT, category TEXT, supplier TEXT, currency TEXT,
+        db.executescript('''CREATE TABLE IF NOT EXISTS fact_purchase(id TEXT PRIMARY KEY, sku TEXT, category TEXT, supplier TEXT, currency TEXT,
          order_date TEXT, promised_date TEXT, delivery_date TEXT, due_date TEXT, paid_date TEXT,
          budget_qty INTEGER, actual_qty INTEGER, budget_price REAL, actual_price REAL, budget_fx REAL,
          actual_fx REAL, budget_brl REAL, actual_brl REAL);
         CREATE TABLE IF NOT EXISTS purchase_runs(id INTEGER PRIMARY KEY, executed_at TEXT, rows INTEGER, sha256 TEXT);
         ''')
+        existing_columns={r[1] for r in db.execute('PRAGMA table_info(fact_purchase)')}
+        if 'row_sha256' not in existing_columns:
+            db.execute('ALTER TABLE fact_purchase ADD COLUMN row_sha256 TEXT')
+        db.execute('CREATE INDEX IF NOT EXISTS idx_purchase_supplier_currency_order ON fact_purchase(supplier,currency,order_date)')
+        fields=[r[1] for r in db.execute('PRAGMA table_info(fact_purchase)')]
         columns=list(rows[0])
-        db.executemany('INSERT INTO fact_purchase VALUES('+','.join('?' for _ in columns)+')',
-          [tuple(r[k] for k in columns) for r in rows])
+        changes_before=db.total_changes
+        update_fields=','.join(f'{field}=excluded.{field}' for field in fields if field!='id')
+        db.executemany('INSERT INTO fact_purchase VALUES('+','.join('?' for _ in fields)+') ON CONFLICT(id) DO UPDATE SET '+update_fields+' WHERE fact_purchase.row_sha256 IS NOT excluded.row_sha256',
+          [tuple(r[k] for k in columns)+(hashlib.sha256(json.dumps(r,sort_keys=True).encode()).hexdigest(),) for r in rows])
+        changed=db.total_changes-changes_before
+        query_plan=[r[-1] for r in db.execute('EXPLAIN QUERY PLAN SELECT SUM(actual_brl) FROM fact_purchase WHERE supplier=? AND currency=? AND order_date>=?',('Han River','USD','2026-01-01'))]
         executed = datetime.now(timezone.utc).isoformat()
         db.execute('INSERT INTO purchase_runs VALUES(NULL,?,?,?)',(executed,len(rows),payload_hash))
         monthly=[dict(month=m,orders=n,budgetBrl=b,actualBrl=a) for m,n,b,a in db.execute('''
@@ -84,7 +92,7 @@ def run(output, database):
        'Volume aumenta a partir de julho; placas têm aumento adicional a partir de junho.',
        'Han River tem atraso médio simulado maior; variações são geradas com semente fixa.',
        'Entregas e pagamentos posteriores à data de corte são nulos e tratados como pendentes, nunca como pontuais.'],
-      'run':{'executedAt':executed,'rows':len(rows),'sha256':payload_hash,'invalidRows':0,'duplicateIds':0,
+      'run':{'executedAt':executed,'rows':len(rows),'sha256':payload_hash,'invalidRows':0,'duplicateIds':0,'changedRows':changed,'unchangedRows':len(rows)-changed,'queryPlan':query_plan,
        'budgetBrl':round(sum(r['budgetBrl'] for r in rows),2),'actualBrl':round(sum(r['actualBrl'] for r in rows),2)},
       'monthly':monthly,'suppliers':suppliers,'rows':rows}
     output.parent.mkdir(parents=True,exist_ok=True)

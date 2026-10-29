@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {replayCutoff,observedPurchases,commandMatches} from '../web/terminal-state.mjs';
+import {forwardIllustration} from '../web/terminal-quant-view.mjs';
+test('replay clamps month to known cutoff and censors future outcomes without mutation',()=>{const rows=[{orderDate:'2026-03-01',deliveryDate:'2026-04-01',paidDate:'2026-05-01'},{orderDate:'2026-05-01'}];const cut=replayCutoff(3,'2026-10-28');assert.equal(cut,'2026-03-31');assert.equal(replayCutoff(10,'2026-10-28'),'2026-10-28');const result=observedPurchases(rows,cut);assert.equal(result.length,1);assert.equal(result[0].deliveryDate,null);assert.equal(result[0].paidDate,null);assert.equal(rows[0].deliveryDate,'2026-04-01');});
+test('command search handles accents and no-match query',()=>{assert.equal(commandMatches([{label:'Decomposição',keywords:'câmbio'}],'cambio').length,1);assert.equal(commandMatches([{label:'Pedidos'}],'naoexiste').length,0);});
+test('interest illustration uses separate calendars and rejects invalid domains',()=>{assert.equal(forwardIllustration({spot:5,domestic:0,foreign:0,businessDays:63,calendarDays:90}),5);assert.throws(()=>forwardIllustration({spot:-1,domestic:.1,foreign:.05,businessDays:63,calendarDays:90}));});

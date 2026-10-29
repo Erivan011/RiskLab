@@ -242,3 +242,37 @@ separado dos pagamentos. Wilson é ilustrativo e não elimina dependência dos p
 
 SQL: `analysis/sql/purchase_investigation.sql`. Materiais M/DAX para Power BI Desktop
 estão em `analysis/powerbi`; **não há PBIX executado ou validado** neste ambiente.
+
+### Recursos V4 integrados
+
+Os arquivos fornecidos pelo usuário foram revisados e adaptados, sem substituir os
+motores existentes por resultados fixos do protótipo:
+
+- Replay acumulado janeiro–outubro, com entregas/pagamentos posteriores ao corte
+  ocultados como pendentes. O replay não altera o experimento cambial independente.
+- Busca de ações por Ctrl/Cmd+K, navegação por teclado e painel lateral de pedidos.
+- Relatório quantitativo materializado por Python (`terminal_quant_report.py`) e
+  consumido pelo site: VaR Gaussiano, Cornish–Fisher, t-Student; ES t-Student;
+  Kupiec e Christoffersen com fronteiras temporais e casos não estimáveis.
+- EWMA e GARCH(1,1) parametrizado, inicializados exclusivamente antes de 2026;
+  nenhuma alegação de GARCH ajustado, validação regulatória ou aprovação automática.
+- Ilustração de taxa a termo com dias úteis e corridos separados, implementada em
+  JavaScript/Python e com referência Java preservando `Exposure` e a API existente.
+  Não é cotação executável nem usa SOFR como sinônimo de cupom cambial brasileiro.
+- Carga de compras sem DROP, hash por pedido, UPSERT de todos os campos quando o
+  conteúdo muda, contagem real de alterações e plano de consulta com parâmetros.
+- Docker Compose adaptado: `docker compose up --build web`; análise opcional via
+  `docker compose --profile analysis run --build --rm analysis-tests`.
+
+Gerar o relatório quantitativo exige as dependências Python da análise:
+
+```bash
+PYTHONPATH=analysis/src python analysis/scripts/terminal_quant_report.py
+PYTHONPATH=analysis/src python -m unittest discover -s analysis/tests -v
+```
+
+O relatório identifica data/hashes da fonte. Não é atualização intradiária ou tarefa
+agendada. Java e Docker têm verificações configuradas, mas não foram executados no
+ambiente local desta integração, que não tem javac ou Docker. A interface atual
+continua modular em JavaScript; os recursos do TSX foram adaptados aos dados e
+motores do projeto, sem introduzir uma segunda aplicação com métricas divergentes.

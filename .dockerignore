@@ -1,0 +1,11 @@
+.git
+node_modules
+upload
+.env
+.env.*
+**/__pycache__
+**/*.pyc
+analysis/data
+analysis/reports
+java-risk/out
+*.zip

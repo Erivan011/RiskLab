@@ -1,0 +1,7 @@
+FROM python:3.12-slim
+WORKDIR /app/analysis
+COPY analysis/requirements-tested.txt ./requirements-tested.txt
+RUN pip install --no-cache-dir -r requirements-tested.txt
+COPY analysis/ ./
+ENV PYTHONPATH=/app/analysis/src
+CMD ["python", "-m", "unittest", "discover", "-s", "tests", "-v"]

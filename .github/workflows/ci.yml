@@ -14,3 +14,14 @@ jobs:
           node-version: '24'
       - run: npm test
       - run: npm run validate
+  terminal-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r analysis/requirements-tested.txt
+      - run: python -m unittest discover -s analysis/tests -v
+        env:
+          PYTHONPATH: analysis/src
