@@ -18,7 +18,7 @@ http
         res.end(JSON.stringify(data));
         return;
       }
-      const pathname = ["/", "/index.html"].includes(url.pathname) ? "/analytics.html" : url.pathname;
+      const pathname = ["/", "/index.html"].includes(url.pathname) ? "/bi.html" : url.pathname;
       if (!/^\/[\w.-]+$/.test(pathname)) {
         res.writeHead(404);
         res.end();

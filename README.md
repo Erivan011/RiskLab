@@ -176,3 +176,22 @@ Cada execução registra hash SHA-256, contagens de qualidade e quantidade de pr
 inseridos/revisados. Uma carga idêntica não altera as cotações, mas cria novo registro
 de execução. Consultas: `analysis/sql/market_quality.sql`. O warehouse não é um
 serviço Python residente nem uma tarefa agendada; o explorador usa a API ao abrir.
+
+### Central de BI
+
+A página inicial agora é `bi.html`: navegação lateral, cinco áreas, filtros globais,
+seleção cruzada por fornecedor/categoria/moeda, detalhamento por operação e CSV.
+As comparações usam orçamento e reavaliação da mesma carteira, não receita ou
+resultado realizado. Risco estatístico e simulação probabilística seguem acessíveis
+por links próprios; os filtros da carteira não são aplicados silenciosamente a
+experimentos com outro grão.
+
+Modelo dimensional reproduzível no mesmo warehouse de cotações:
+
+```bash
+python analysis/scripts/operations_warehouse.py --input web/trade-demo.json --database /tmp/risklab.sqlite
+```
+
+Consultas reconciliáveis: `analysis/sql/operations_bi.sql`. O painel web calcula os
+indicadores a partir do JSON demonstrativo e da API BCB; não afirma consultar um
+warehouse SQL em produção. Trata-se de aplicação web de BI, não arquivo Power BI.
