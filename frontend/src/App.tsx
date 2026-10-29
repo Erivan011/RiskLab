@@ -281,17 +281,9 @@ export default function App() {
 
       {/* Top Monochrome Institutional Bar */}
       <div className="bg-[#12151B] border-b border-[#262B36] px-5 py-2 text-[11px] font-mono flex flex-wrap items-center justify-between gap-4 text-[#8B949E]">
-        <div className="flex items-center gap-4">
-          <span className="text-[#FFFFFF] font-semibold tracking-wider uppercase">
-            RISKLAB ANALYTICS TERMINAL v4.0
-          </span>
-          <span className="text-[#262B36]">|</span>
-          <span>AC AURORA COMPONENTES</span>
-          <span className="hidden md:inline text-[#262B36]">|</span>
-          <span className="hidden md:inline">
-             DADOS & MÉTODO: <strong className="text-[#C4A982]">BASE SINTÉTICA · PYTHON / SQL / REACT</strong>
-          </span>
-        </div>
+        <a href="/" aria-label="RiskLab — Trade Research" className="inline-flex items-baseline whitespace-nowrap no-underline text-[#E5E5DC]" style={{fontFamily:'Georgia, serif',fontSize:27,letterSpacing:'-1px',lineHeight:1.3}}>
+          RiskLab<span aria-hidden="true">.</span><small style={{fontFamily:'monospace',fontSize:9,letterSpacing:'1.7px',marginLeft:12}}>TRADE RESEARCH</small>
+        </a>
 
         <div className="flex items-center gap-2.5">
           <button
