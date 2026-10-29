@@ -220,3 +220,25 @@ python analysis/scripts/volatility_experiment.py --database /tmp/risklab.sqlite 
 Execute a ingestão do histórico antes; veja `analysis/sql/volatility_evaluation.sql`.
 A previsão da variância não é previsão da direção do câmbio. O alvo r² é ruidoso,
 a amostra é limitada e o intervalo bootstrap depende da hipótese de blocos.
+
+### Histórico de compras e desempenho dos fornecedores
+
+A página principal (`performance.html`) consome **o artefato persistido**
+`purchase-research.json`, produzido pelo pipeline Python/SQLite. São 480 pedidos
+100% sintéticos, 24 SKUs, 8 fornecedores, janeiro–outubro de 2026. Câmbio faturado,
+preços, entregas e pagamentos desta área também são sintéticos; não são BCB nem
+estimativas de uma empresa real. A mesa de risco anterior permanece em `bi.html`.
+
+```bash
+python analysis/scripts/purchase_pipeline.py --output web/purchase-research.json --database /tmp/risklab-purchases.sqlite
+```
+
+O artefato registra data da execução, semente, hash dos pedidos, regras geradoras,
+qualidade e agregados SQL reconciliados. A decomposição Shapley reparte os efeitos
+volume/composição/preço/câmbio nas 24 ordens possíveis e explicita arredondamento.
+Não é análise causal. Entregas não observadas no corte são censuradas: não entram
+no denominador de pontualidade e são investigadas como pendentes, com aging
+separado dos pagamentos. Wilson é ilustrativo e não elimina dependência dos pedidos.
+
+SQL: `analysis/sql/purchase_investigation.sql`. Materiais M/DAX para Power BI Desktop
+estão em `analysis/powerbi`; **não há PBIX executado ou validado** neste ambiente.

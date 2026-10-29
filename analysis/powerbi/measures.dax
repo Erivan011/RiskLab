@@ -1,0 +1,20 @@
+// Each expression below is a separate measure on FactPurchase.
+Pedidos = COUNTROWS(FactPurchase)
+
+Orçamento BRL = SUM(FactPurchase[budgetBrl])
+
+Faturado BRL = SUM(FactPurchase[actualBrl])
+
+Desvio BRL = [Faturado BRL] - [Orçamento BRL]
+
+Desvio Percentual = DIVIDE([Desvio BRL], [Orçamento BRL])
+
+Pedidos Entregues = CALCULATE([Pedidos], FactPurchase[IsDelivered] = TRUE())
+
+Entregas Pontuais = CALCULATE([Pedidos], FactPurchase[IsOnTime] = TRUE())
+
+Pontualidade = DIVIDE([Entregas Pontuais], [Pedidos Entregues])
+
+Pendentes Vencidos = CALCULATE([Pedidos], FactPurchase[IsOverduePending] = TRUE())
+
+Valor Pendente Vencido BRL = CALCULATE([Faturado BRL], FactPurchase[IsOverduePending] = TRUE())
