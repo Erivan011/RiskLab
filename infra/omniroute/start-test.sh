@@ -8,7 +8,7 @@ if ! command -v docker >/dev/null; then
 fi
 printf '%s\n' 'Piloto isolado RiskLab. Use uma NOVA senha exclusiva do painel, não a chave da NVIDIA.'
 if [[ -z "${OMNIROUTE_INITIAL_PASSWORD:-}" ]]; then
-  read -r -s -p 'Nova senha do painel (mínimo 16 caracteres; entrada oculta): ' OMNIROUTE_INITIAL_PASSWORD
+  read -r -s -p 'Nova senha do painel (mínimo 10 caracteres; entrada oculta): ' OMNIROUTE_INITIAL_PASSWORD
   printf '\n'
   read -r -s -p 'Repita a nova senha: ' confirmation
   printf '\n'
@@ -18,8 +18,8 @@ if [[ -z "${OMNIROUTE_INITIAL_PASSWORD:-}" ]]; then
   fi
   unset confirmation
 fi
-if [[ ${#OMNIROUTE_INITIAL_PASSWORD} -lt 16 ]]; then
-  printf '%s\n' 'Senha curta; use ao menos 16 caracteres. Nada foi iniciado.' >&2
+if [[ ${#OMNIROUTE_INITIAL_PASSWORD} -lt 10 ]]; then
+  printf '%s\n' 'Senha curta; use ao menos 10 caracteres. Nada foi iniciado.' >&2
   exit 1
 fi
 export OMNIROUTE_INITIAL_PASSWORD
