@@ -1,0 +1,23 @@
+services:
+  router:
+    # Avaliação isolada; fixar digest revisado antes de qualquer uso permanente.
+    image: diegosouzapw/omniroute:latest
+    restart: "no"
+    stop_grace_period: 40s
+    environment:
+      REQUIRE_API_KEY: "true"
+      INITIAL_PASSWORD: ${OMNIROUTE_INITIAL_PASSWORD:?Defina uma senha exclusiva fora do Git}
+      DATA_DIR: /app/data
+      OMNIROUTE_MEMORY_MB: "2048"
+    ports:
+      - "127.0.0.1:20128:20128"
+    volumes:
+      - router-state:/app/data
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.mjs"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+volumes:
+  router-state:
