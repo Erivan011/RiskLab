@@ -7,15 +7,21 @@ if ! command -v docker >/dev/null; then
   exit 1
 fi
 printf '%s\n' 'Piloto isolado RiskLab. Use uma NOVA senha exclusiva do painel, não a chave da NVIDIA.'
-read -r -s -p 'Nova senha do painel (mínimo 16 caracteres; entrada oculta): ' OMNIROUTE_INITIAL_PASSWORD
-printf '\n'
-read -r -s -p 'Repita a nova senha: ' confirmation
-printf '\n'
-if [[ ${#OMNIROUTE_INITIAL_PASSWORD} -lt 16 || "$OMNIROUTE_INITIAL_PASSWORD" != "$confirmation" ]]; then
-  printf '%s\n' 'Senhas diferentes ou curtas; nada foi iniciado. Execute novamente.' >&2
+if [[ -z "${OMNIROUTE_INITIAL_PASSWORD:-}" ]]; then
+  read -r -s -p 'Nova senha do painel (mínimo 16 caracteres; entrada oculta): ' OMNIROUTE_INITIAL_PASSWORD
+  printf '\n'
+  read -r -s -p 'Repita a nova senha: ' confirmation
+  printf '\n'
+  if [[ "${OMNIROUTE_INITIAL_PASSWORD}" != "${confirmation}" ]]; then
+    printf '%s\n' 'Senhas diferentes; nada foi iniciado. Execute novamente.' >&2
+    exit 1
+  fi
+  unset confirmation
+fi
+if [[ ${#OMNIROUTE_INITIAL_PASSWORD} -lt 16 ]]; then
+  printf '%s\n' 'Senha curta; use ao menos 16 caracteres. Nada foi iniciado.' >&2
   exit 1
 fi
-unset confirmation
 export OMNIROUTE_INITIAL_PASSWORD
 docker compose -f "$script_dir/compose.yaml" config --quiet
 docker compose -f "$script_dir/compose.yaml" up -d --wait --wait-timeout 300
