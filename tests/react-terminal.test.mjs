@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {slice,orders,suppliers,costBridge} from '../frontend/src/data.mjs';
+import {slice,orders,suppliers,costBridge,signedBrl} from '../frontend/src/data.mjs';
 const data=JSON.parse(readFileSync(new URL('../web/purchase-research.json',import.meta.url)));
 test('React adapter reconciles full dataset and Shapley after currency/category/supplier cross-filter',()=>{
  for(const filter of [{},{currency:'USD'},{category:'Sensores'},{currency:'EUR',supplier:'Han River'}]){
@@ -46,4 +46,17 @@ test('Waterfall anchors negative FX and price effects to the preceding cost rath
  assert.deepEqual(bars.slice(1,5).map(b=>[b.BaseInvisivel,b.Delta,b.signed]),[[80,20,-20],[80,10,10],[85,5,-5],[85,2,2]]);
  assert.equal(bars.at(-1).Delta,87);
  for(const c of data.currencies){const s=slice(data,10,{currency:c}),b=costBridge({budget:s.cumBudget,fx:s.fxEffect,volume:s.volEffect,price:s.priceEffect,mix:s.mixEffect});assert.ok(Math.abs(b.at(-1).Delta-s.cumBilled)<1e-7);}
+});
+test('Order Shapley effects keep their sign when rendered as currency',()=>{
+ assert.equal(signedBrl(12798.3648),'+R$ 12.798,365');
+ assert.equal(signedBrl(-12798.3648),'-R$ 12.798,365');
+ assert.equal(signedBrl(0),'R$ 0');
+ const rows=orders(data,10,{});
+ assert.ok(rows.some(r=>r.shapleyFxBrl<0),'dataset must exercise negative FX effects');
+ assert.ok(rows.some(r=>r.shapleyFxBrl>0),'dataset must exercise positive FX effects');
+ for(const r of rows)for(const v of [r.shapleyFxBrl,r.shapleyPriceBrl,r.shapleyVolBrl]){
+  const text=signedBrl(v);
+  assert.ok(!/\+-|-\+/.test(text),'sign must not be duplicated: '+text);
+  assert.equal(text.includes('-'),v<0);
+ }
 });

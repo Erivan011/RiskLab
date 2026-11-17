@@ -14,6 +14,7 @@ export function orders(data,month,filter={}){
  const asOf=cutoff(month,data.asOf);
  return selectRows(data,month,filter).map(r=>{const s=shapleyPurchases([r]),delivered=r.deliveryDate&&r.deliveryDate<=asOf;return {poId:r.id,supplier:r.supplier,country:r.country,category:r.category,currency:r.currency,orderDate:r.orderDate,ptaxOrderDate:r.budgetFx,ptaxInvoiceDate:r.actualFx,budgetBrl:r.budgetBrl,billedBrl:r.actualBrl,shapleyFxBrl:s.effects.fx,shapleyVolBrl:s.effects.volume,shapleyPriceBrl:s.effects.price,delayDays:Math.max(0,Math.round((Date.parse(delivered?r.deliveryDate:asOf)-Date.parse(r.promisedDate))/86400000)),status:delivered?(r.deliveryDate<=r.promisedDate?'DELIVERED_ON_TIME':'DELIVERED_LATE'):(r.promisedDate<asOf?'OVERDUE_PENDING':'PENDING'),sha256:data.run.sha256};});
 }
+export function signedBrl(value){const sign=value>0?'+':value<0?'-':'';return `${sign}R$ ${Math.abs(value).toLocaleString('pt-BR')}`;}
 export function costBridge({budget,fx,volume,price,mix}){
  let current=budget;
  const result=[{etapa:'Orçamento',BaseInvisivel:0,Delta:budget,signed:budget,Tipo:'TOTAL'}];
