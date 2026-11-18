@@ -1,6 +1,6 @@
 import dataset from '../../web/purchase-research.json';
 import report from '../../web/terminal-quant-report.json';
-import {slice,selectRows,suppliers,orders,cutoff,costBridge} from './data.mjs';
+import {slice,selectRows,suppliers,orders,cutoff,costBridge,signedBrl} from './data.mjs';
 import {Quant} from './Quant';
 import {Pipeline} from './Pipeline';
 import {GlobalExposure} from './GlobalExposure';
@@ -666,7 +666,7 @@ export default function App() {
                             <td className="py-2.5 px-2.5 text-[#8B949E]">{po.orderDate}</td>
                             <td className="py-2.5 px-2.5 text-right text-[#8B949E]">R$ {po.budgetBrl.toLocaleString('pt-BR')}</td>
                             <td className="py-2.5 px-2.5 text-right text-[#FFFFFF] font-bold">R$ {po.billedBrl.toLocaleString('pt-BR')}</td>
-                            <td className="py-2.5 px-2.5 text-right text-[#C4A982]">+R$ {po.shapleyFxBrl.toLocaleString('pt-BR')}</td>
+                            <td className="py-2.5 px-2.5 text-right text-[#C4A982]">{signedBrl(po.shapleyFxBrl)}</td>
                             <td className="py-2.5 px-2.5 text-[#5B759B] underline">Abrir Raio-X →</td>
                           </tr>
                         ))}
@@ -737,16 +737,16 @@ export default function App() {
                     <span className="text-[#FFFFFF]">R$ {drawerOrder.budgetBrl.toLocaleString('pt-BR')}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#8B949E]">+ Efeito Câmbio (FX):</span>
-                    <span className="text-[#C4A982]">+R$ {drawerOrder.shapleyFxBrl.toLocaleString('pt-BR')}</span>
+                    <span className="text-[#8B949E]">Efeito Câmbio (FX):</span>
+                    <span className="text-[#C4A982]">{signedBrl(drawerOrder.shapleyFxBrl)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#8B949E]">+ Efeito Preço:</span>
-                    <span className="text-[#A0A8B6]">+R$ {drawerOrder.shapleyPriceBrl.toLocaleString('pt-BR')}</span>
+                    <span className="text-[#8B949E]">Efeito Preço:</span>
+                    <span className="text-[#A0A8B6]">{signedBrl(drawerOrder.shapleyPriceBrl)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#8B949E]">+ Efeito Volume:</span>
-                    <span className="text-[#5B759B]">+R$ {drawerOrder.shapleyVolBrl.toLocaleString('pt-BR')}</span>
+                    <span className="text-[#8B949E]">Efeito Volume:</span>
+                    <span className="text-[#5B759B]">{signedBrl(drawerOrder.shapleyVolBrl)}</span>
                   </div>
                   <div className="pt-2 border-t border-[#262B36] flex justify-between font-bold">
                     <span className="text-[#FFFFFF]">Total Faturado:</span>
