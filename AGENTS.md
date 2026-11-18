@@ -7,7 +7,8 @@ Projeto pessoal de portfólio com operações fictícias e pesquisa quantitativa
 - Usar scripts determinísticos para tarefas repetitivas. Um agente executa e valida; não criar equipes para mudanças pequenas.
 - Responder em português. Ao terminar, informar mudança, evidência, testes e bloqueios; citar PR/commit. Sem evidência, registrar pendente.
 - Atualizar a memória com até um resumo curto por tarefa, sem segredos; condensar histórico repetitivo.
-- Não instalar serviços pagos, usar modelos pagos ou mudar o modelo automaticamente. Não usar Gemini/NVIDIA neste projeto até existir configuração e teste explícitos do proprietário. Ao esgotar cota gratuita, parar e registrar o bloqueio, sem fallback pago ou tentativas ilimitadas.
+- O proprietário autorizou considerar Gemini e NVIDIA/Nemotron via OmniRoute para tarefas dos agentes. Usar apenas o modelo e provedor configurados; não presumir que assinatura de chat cobre API, que a cota seja gratuita ou ilimitada, e verificar o uso no provedor. Não inserir a API no produto. Sem troca automática, fallback pago, repetição ilimitada ou chamadas agendadas.
+- No RiskLab, houve uma chamada manual TESTE_OK pela OmniRoute e uma tarefa de leitura sem alteração. Isso valida somente a chamada isolada naquele momento. O endpoint usa um Codespace que pode parar; conferir disponibilidade a cada execução. Usar prompts sintéticos/mínimos e nunca enviar credenciais, dados privados ou conteúdo do Dogma.
 - As instruções não impõem um teto técnico de tokens ou cobrança. Não afirmar gasto zero ou execução contínua sem verificar o provedor e o executor.
 - Não fazer merge, deploy, migração de banco, alteração de permissões nem ações em contas externas automaticamente. Entregar branch/PR revisável.
 - Jamais consultar Dogma ou importar seus dados, credenciais ou contexto para este projeto. Usar dados demonstrativos e sintéticos.
