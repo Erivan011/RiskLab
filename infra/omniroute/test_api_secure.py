@@ -43,7 +43,8 @@ def main() -> int:
     if not model or any(ord(char) < 32 for char in model):
         print("ID do modelo inválido.", file=sys.stderr)
         return 2
-    api_key = os.environ.pop("omnirouteclientkey", None) or os.environ.pop("OMNIROUTE_CLIENT_KEY", None)
+    secret_name = next((name for name in os.environ if name.lower() in {"omnirouteclientkey", "omniroute_client_key"}), None)
+    api_key = os.environ.pop(secret_name) if secret_name else None
     if api_key is None:
         api_key = getpass("Chave de cliente da OmniRoute (entrada oculta): ").strip()
     else:
