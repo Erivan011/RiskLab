@@ -1,6 +1,7 @@
 """Faz uma única chamada OpenAI-compatible sem salvar ou exibir a chave."""
 
 from getpass import getpass
+import os
 import json
 import sys
 from urllib.error import HTTPError, URLError
@@ -42,7 +43,11 @@ def main() -> int:
     if not model or any(ord(char) < 32 for char in model):
         print("ID do modelo inválido.", file=sys.stderr)
         return 2
-    api_key = getpass("Chave de cliente da OmniRoute (entrada oculta): ").strip()
+    api_key = os.environ.pop("OMNIROUTE_CLIENT_KEY", None)
+    if api_key is None:
+        api_key = getpass("Chave de cliente da OmniRoute (entrada oculta): ").strip()
+    else:
+        api_key = api_key.strip()
     if not api_key:
         print("Chave vazia; nenhuma requisição enviada.", file=sys.stderr)
         return 2
