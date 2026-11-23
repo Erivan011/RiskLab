@@ -22,6 +22,11 @@ SUPPLIERS += ['Aurora Brasil','Shenzhen Components','Maple Circuits','Southern S
 SKU_COUNT = 40
 
 
+def _country_risk(currency):
+    """Flag country risk based on absolute FX drift > 0.005 per month."""
+    return abs(DRIFT.get(currency, 0)) > 0.005
+
+
 def generate():
     rng = random.Random(SEED)
     rows = []
@@ -57,7 +62,8 @@ def generate():
                     dueDate=due.isoformat(),paidDate=paid.isoformat() if paid else None,
                     budgetQty=planned,actualQty=quantity,budgetPrice=budget_price,actualPrice=actual_price,
                     budgetFx=budget_fx,actualFx=invoice_fx,
-                    budgetBrl=round(planned*budget_price*budget_fx,2),actualBrl=round(quantity*actual_price*invoice_fx,2),country=COUNTRIES[supplier_index]))
+                    budgetBrl=round(planned*budget_price*budget_fx,2),actualBrl=round(quantity*actual_price*invoice_fx,2),
+                    country=COUNTRIES[supplier_index],countryRisk=_country_risk(currency)))
     return rows
 
 
@@ -71,19 +77,19 @@ def run(output, database):
         db.executescript('''CREATE TABLE IF NOT EXISTS fact_purchase(id TEXT PRIMARY KEY, sku TEXT, category TEXT, supplier TEXT, currency TEXT,
          order_date TEXT, promised_date TEXT, delivery_date TEXT, due_date TEXT, paid_date TEXT,
          budget_qty INTEGER, actual_qty INTEGER, budget_price REAL, actual_price REAL, budget_fx REAL,
-         actual_fx REAL, budget_brl REAL, actual_brl REAL);
+         actual_fx REAL, budget_brl REAL, actual_brl REAL, country TEXT, countryRisk INTEGER);
         CREATE TABLE IF NOT EXISTS purchase_runs(id INTEGER PRIMARY KEY, executed_at TEXT, rows INTEGER, sha256 TEXT);
         ''')
         existing_columns={r[1] for r in db.execute('PRAGMA table_info(fact_purchase)')}
-        if 'row_sha256' not in existing_columns:
-            db.execute('ALTER TABLE fact_purchase ADD COLUMN row_sha256 TEXT')
+        if 'countryRisk' not in existing_columns:
+            db.execute('ALTER TABLE fact_purchase ADD COLUMN countryRisk INTEGER')
         if 'country' not in existing_columns:
             db.execute('ALTER TABLE fact_purchase ADD COLUMN country TEXT')
         db.execute('CREATE INDEX IF NOT EXISTS idx_purchase_country_currency_order ON fact_purchase(country,currency,order_date)')
         db.execute('CREATE INDEX IF NOT EXISTS idx_purchase_supplier_currency_order ON fact_purchase(supplier,currency,order_date)')
         row_fields=list(rows[0])
         db_fields=['id','sku','category','supplier','currency','order_date','promised_date','delivery_date','due_date','paid_date',
-                   'budget_qty','actual_qty','budget_price','actual_price','budget_fx','actual_fx','budget_brl','actual_brl','country','row_sha256']
+                   'budget_qty','actual_qty','budget_price','actual_price','budget_fx','actual_fx','budget_brl','actual_brl','country','countryRisk','row_sha256']
         changes_before=db.total_changes
         update_fields=','.join(f'{field}=excluded.{field}' for field in db_fields if field!='id')
         db.executemany('INSERT INTO fact_purchase ('+','.join(db_fields)+') VALUES('+','.join('?' for _ in db_fields)+') ON CONFLICT(id) DO UPDATE SET '+update_fields+' WHERE fact_purchase.row_sha256 IS NOT excluded.row_sha256',
@@ -92,11 +98,8 @@ def run(output, database):
         query_plan=[r[-1] for r in db.execute('EXPLAIN QUERY PLAN SELECT SUM(actual_brl) FROM fact_purchase WHERE supplier=? AND currency=? AND order_date>=?',('Han River','USD','2026-01-01'))]
         executed = datetime.now(timezone.utc).isoformat()
         db.execute('INSERT INTO purchase_runs VALUES(NULL,?,?,?)',(executed,len(rows),payload_hash))
-        monthly=[dict(month=m,orders=n,budgetBrl=b,actualBrl=a) for m,n,b,a in db.execute('''
-          SELECT substr(order_date,1,7),COUNT(*),ROUND(SUM(budget_brl),2),ROUND(SUM(actual_brl),2)
-          FROM fact_purchase GROUP BY 1 ORDER BY 1''')]
-        suppliers=[dict(supplier=s,orders=n,actualBrl=a) for s,n,a in db.execute('''
-          SELECT supplier,COUNT(*),ROUND(SUM(actual_brl),2) FROM fact_purchase GROUP BY 1 ORDER BY 3 DESC''')]
+        monthly=[dict(month=m,orders=n,budgetBrl=b,actualBrl=a) for m,n,b,a in db.execute('''\n          SELECT substr(order_date,1,7),COUNT(*),ROUND(SUM(budget_brl),2),ROUND(SUM(actual_brl),2)\n          FROM fact_purchase GROUP BY 1 ORDER BY 1''')]
+        suppliers=[dict(supplier=s,orders=n,actualBrl=a) for s,n,a in db.execute('''\n          SELECT supplier,COUNT(*),ROUND(SUM(actual_brl),2) FROM fact_purchase GROUP BY 1 ORDER BY 3 DESC''')]
     report = {'schemaVersion':2,'asOf':AS_OF.isoformat(),'sourceKind':'synthetic','seed':SEED,
       'disclosure':'Todos os pedidos, valores, preços, câmbio faturado, fornecedores, pagamentos e entregas desta área são sintéticos. Não são dados de uma empresa real nem cotações BCB.',
       'currencies':list(FX),'countries':COUNTRIES,'planningFxBrlPerUnit':FX,
