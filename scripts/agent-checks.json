@@ -2,6 +2,14 @@
   "name": "RiskLab",
   "checks": [
     [
+      "terminal",
+      "Build, testes e integridade do artefato",
+      [
+        "npm",
+        "test"
+      ]
+    ],
+    [
       "dados",
       "Qualidade dos dados e séries cambiais",
       [
@@ -20,14 +28,6 @@
         "tests/risk-engine.test.mjs",
         "tests/purchase-engine.test.mjs",
         "tests/portfolio-analytics.test.mjs"
-      ]
-    ],
-    [
-      "terminal",
-      "Build, testes e integridade do artefato",
-      [
-        "npm",
-        "test"
       ]
     ],
     [
