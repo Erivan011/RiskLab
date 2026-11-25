@@ -1,2 +1,7 @@
 @import "tailwindcss";
 @source "./App.tsx";
+
+.terminal-modules-toggle { background:#1e232d; color:#e5e5dc; border-bottom:1px solid #343b4a; min-height:44px; padding:10px 20px; text-align:left; font-size:13px; font-weight:650; }
+.terminal-modules-toggle span { float:right; color:#c4a982; }
+.terminal-study-link { display:inline-flex; align-items:center; min-height:32px; color:#e5cfab; padding-inline:8px; }
+.terminal-study-link:hover { text-decoration:underline; }

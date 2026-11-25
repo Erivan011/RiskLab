@@ -19,3 +19,7 @@ python scripts/agent_cycle.py --ollama-model qwen2.5:0.5b
 O agente envia uma única chamada à API local. A entrada contém somente IDs, estados e tendências das verificações. O modelo prioriza uma verificação existente entre as opções permitidas. O executor traduz o estado dessa evidência em uma próxima ação concreta. O modelo não recebe logs, código, chaves ou dados operacionais e não tem acesso a ferramentas. Os resultados dos testes continuam sendo a fonte do estado do ciclo.
 
 Referências: [API do Ollama](https://docs.ollama.com/api/generate), [modo local](https://docs.ollama.com/faq), [agendamentos do GitHub](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
+
+## Navegação e evolução visual
+
+Instale também `python -m pip install playwright==1.62.0` e `python -m playwright install chromium`. O agente de navegação testa links e recursos locais no navegador. O agente de design compara observações de desktop e celular e testa uma proposta de CSS na prévia, inclusive em ciclos em que nenhum link falha. O artefato inclui capturas, relatório e CSS para revisão. O workflow executa esses agentes com permissão de leitura.

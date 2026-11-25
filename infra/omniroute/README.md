@@ -33,3 +33,5 @@ Para inicialização normal, use `./scripts/start.sh` no checkout oficial. Antes
 Depois de confirmar saúde do OpenBot e da OmniRoute no host local, rode o teste sintético deste README. Se funcionar isoladamente, valide o Assistente Geral e o Orquestrador individualmente com memória e ferramentas mínimas. Os logs relatados tinham até 148.290 tokens de entrada para um limite de 128.000. Reduzir a saída ou ajustar o esforço de raciocínio não encurta o histórico e as ferramentas já enviados. Só reative contexto e delegação por etapas após medir o tamanho de entrada de cada bot.
 
 Referência: [configuração oficial do OpenBot](https://github.com/CopilotKit/OpenBot/blob/main/docs/configuration.md#backend-images).
+
+Use `bash infra/omniroute/openbot_preflight.sh /caminho/para/OpenBot` no host que executa os serviços. O preflight valida a resolução das tags do Compose e checa as portas locais sem exibir configurações ou respostas. Se localhost estiver saudável e a URL encaminhada retornar 404, a investigação passa para o encaminhamento e a sessão do Codespace. Um 404 de link encaminhado sozinho não comprova falha do modelo.
