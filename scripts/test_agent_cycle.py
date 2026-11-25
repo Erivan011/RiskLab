@@ -27,7 +27,7 @@ class AgentCycleTests(unittest.TestCase):
         with patch.object(agent, "build_opener") as builder:
             opener = builder.return_value
             response = opener.open.return_value.__enter__.return_value
-            response.read.return_value = json.dumps({"response": '{"check":"solver","action":"Reproduza o cenário."}'}).encode()
+            response.read.return_value = json.dumps({"response": '{"check":"solver"}'}).encode()
             self.assertEqual(agent.infer(events, "qwen2.5:0.5b")["check"], "solver")
             request = opener.open.call_args.args[0]
             self.assertEqual(request.full_url, "http://127.0.0.1:11434/api/generate")

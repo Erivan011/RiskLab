@@ -79,24 +79,25 @@ def write_history(path, cycles):
 
 
 def infer(events, model):
-    ids = [event["id"] for event in events]
+    candidates = [event for event in events if event["status"] != "passed"] or events
+    ids = [event["id"] for event in candidates]
     schema = {
         "type": "object",
-        "properties": {"check": {"type": "string", "enum": ids}, "action": {"type": "string"}},
-        "required": ["check", "action"],
+        "properties": {"check": {"type": "string", "enum": ids}},
+        "required": ["check"],
         "additionalProperties": False,
     }
     prompt = (
-        "Sugira em português uma única próxima verificação manual, em até 240 caracteres. "
-        "Use somente uma das evidências fornecidas e não invente causas ou resultados. "
-        "Se houver falha, priorize-a. Evidências: " + json.dumps(events, ensure_ascii=False)
+        "Choose one check for a maintainer to inspect. Prefer new failures, then repeated "
+        "failures, then recently recovered checks. Return exactly one provided id as JSON "
+        'with key "check". Evidence: ' + json.dumps(candidates, ensure_ascii=False)
     )
     payload = {
         "model": model,
         "prompt": prompt,
         "stream": False,
         "format": schema,
-        "options": {"num_ctx": 2048, "num_predict": 140, "temperature": 0},
+        "options": {"num_ctx": 2048, "num_predict": 32, "temperature": 0},
     }
     request = Request(
         "http://127.0.0.1:11434/api/generate",
@@ -106,12 +107,16 @@ def infer(events, model):
     with build_opener(ProxyHandler({}), NoRedirect()).open(request, timeout=90) as response:
         result = json.loads(response.read(65537))
     advice = json.loads(result["response"])
-    if not isinstance(advice, dict) or set(advice) != {"check", "action"}:
-        raise ValueError("Resposta fora do esquema")
-    action = advice["action"]
-    if advice["check"] not in ids or not isinstance(action, str) or not 1 <= len(action.strip()) <= 240:
+    if not isinstance(advice, dict) or set(advice) != {"check"} or advice["check"] not in ids:
         raise ValueError("Resposta sem evidência válida")
-    return {"check": advice["check"], "action": " ".join(action.split())}
+    selected = next(event for event in candidates if event["id"] == advice["check"])
+    action = {
+        "new": "Reproduzir a falha e conferir o primeiro erro no log da verificação.",
+        "repeated": "Comparar os logs dos ciclos com falha e identificar o erro recorrente.",
+        "recovered": "Repetir a verificação para confirmar que a recuperação se mantém.",
+        "passing": "Acompanhar esta verificação no próximo ciclo.",
+    }[selected["trend"]]
+    return {"check": selected["id"], "action": action}
 
 
 def main():

@@ -16,6 +16,6 @@ Com o Ollama vinculado a `127.0.0.1:11434` e o modo local habilitado (`OLLAMA_NO
 python scripts/agent_cycle.py --ollama-model qwen2.5:0.5b
 ```
 
-O agente envia uma única chamada à API local. A entrada contém somente IDs, estados e tendências das verificações. A saída curta aponta uma evidência conhecida e sugere uma verificação. O modelo não recebe logs, código, chaves ou dados operacionais e não tem acesso a ferramentas. Os resultados dos testes continuam sendo a fonte do estado do ciclo.
+O agente envia uma única chamada à API local. A entrada contém somente IDs, estados e tendências das verificações. O modelo prioriza uma verificação existente entre as opções permitidas. O executor traduz o estado dessa evidência em uma próxima ação concreta. O modelo não recebe logs, código, chaves ou dados operacionais e não tem acesso a ferramentas. Os resultados dos testes continuam sendo a fonte do estado do ciclo.
 
 Referências: [API do Ollama](https://docs.ollama.com/api/generate), [modo local](https://docs.ollama.com/faq), [agendamentos do GitHub](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
