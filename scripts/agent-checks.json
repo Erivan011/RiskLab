@@ -1,0 +1,43 @@
+{
+  "name": "RiskLab",
+  "checks": [
+    [
+      "dados",
+      "Qualidade dos dados e séries cambiais",
+      [
+        "node",
+        "--test",
+        "tests/data-quality.test.mjs",
+        "tests/market-data.test.mjs"
+      ]
+    ],
+    [
+      "risco",
+      "Reconciliação de risco, compras e portfólio",
+      [
+        "node",
+        "--test",
+        "tests/risk-engine.test.mjs",
+        "tests/purchase-engine.test.mjs",
+        "tests/portfolio-analytics.test.mjs"
+      ]
+    ],
+    [
+      "terminal",
+      "Build, testes e integridade do artefato",
+      [
+        "npm",
+        "test"
+      ]
+    ],
+    [
+      "artefato",
+      "Verificação final dos arquivos distribuídos",
+      [
+        "npm",
+        "run",
+        "validate"
+      ]
+    ]
+  ]
+}

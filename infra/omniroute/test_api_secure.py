@@ -6,11 +6,16 @@ import json
 import sys
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
-from urllib.request import Request, ProxyHandler, build_opener
+from urllib.request import HTTPRedirectHandler, Request, ProxyHandler, build_opener
 
 
 DEFAULT_BASE_URL = "http://127.0.0.1:20128"
 DEFAULT_MODEL = "nvidia/nvidia/nemotron-3.5-lightning-30b-a3b"
+
+
+class NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
 
 
 def validate_base_url(value: str) -> str:
@@ -72,25 +77,27 @@ def main() -> int:
         method="POST",
     )
     del api_key
-    opener = build_opener(ProxyHandler({}))
+    opener = build_opener(ProxyHandler({}), NoRedirect())
     try:
         with opener.open(request, timeout=60) as response:
-            result = json.loads(response.read().decode("utf-8"))
+            result = json.loads(response.read(65537))
     except HTTPError as exc:
         print(f"A API recusou a chamada (HTTP {exc.code}). A resposta não foi exibida para evitar expor dados.", file=sys.stderr)
         return 1
-    except (URLError, TimeoutError, json.JSONDecodeError) as exc:
+    except (URLError, TimeoutError, ValueError) as exc:
         print(f"Não foi possível concluir o teste ({type(exc).__name__}).", file=sys.stderr)
         return 1
 
-    choices = result.get("choices") or []
-    message = choices[0].get("message", {}) if choices else {}
-    content = message.get("content")
+    choices = result.get("choices", []) if isinstance(result, dict) else []
+    choice = choices[0] if isinstance(choices, list) and choices else None
+    message = choice.get("message") if isinstance(choice, dict) else None
+    content = message.get("content") if isinstance(message, dict) else None
     if isinstance(content, list):
-        content = "".join(part.get("text", "") for part in content if isinstance(part, dict))
-    print("Resposta do modelo:")
-    print(content if isinstance(content, str) else "(a API retornou sem texto)")
-    print("Teste concluído; chave não foi salva nem exibida pelo script.")
+        content = "".join(part["text"] for part in content if isinstance(part, dict) and isinstance(part.get("text"), str))
+    if not isinstance(content, str) or content.strip() != "TESTE_OK":
+        print("O modelo não confirmou TESTE_OK; a resposta foi omitida.", file=sys.stderr)
+        return 1
+    print("TESTE_OK: o modelo respondeu ao teste sintético.")
     return 0
 
 
