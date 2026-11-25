@@ -26,6 +26,7 @@ function render(intro=false){
  const state=editorialState(INPUT,activeShock);
  ui('question-shock').textContent=Math.round(activeShock*100);
  ui('shock-output').textContent='+'+Math.round(activeShock*100)+'%';
+ document.querySelectorAll('[data-shock]').forEach(button=>button.setAttribute('aria-pressed',String(Number(button.dataset.shock)===Math.round(activeShock*100))));
  animateMoney(ui('funding'),state.fundingCents,formatBrl);
  ui('answer-text').innerHTML=answerMarkup(state);
  ui('profile').innerHTML=profileSvg(state,INPUT);
@@ -40,6 +41,10 @@ function render(intro=false){
  installChartProbe(ui('profile'),state,INPUT,formatBrl);
 }
 ui('usd-shock').addEventListener('input',event=>{activeShock=Number(event.target.value)/100;render()});
+document.querySelectorAll('[data-shock]').forEach(button=>button.addEventListener('click',()=>{
+ ui('usd-shock').value=button.dataset.shock;
+ ui('usd-shock').dispatchEvent(new Event('input',{bubbles:true}));
+}));
 ui('download-report').onclick=()=>{const state=editorialState(INPUT,activeShock);const report={model:'USD-only contractual sensitivity',disclosure:'Carteira fictícia; sem previsão ou execução.',input:INPUT,shock:{USD:activeShock,EUR:0,GBP:0},fundingCents:state.fundingCents,baseFundingCents:state.baseFundingCents,dailyLedger:state.analysis.cash,hedgeHypotheses:state.hedges.map(h=>({coverage:h.coverage,totalCents:h.analysis.totalCents,shockImpactCents:h.analysis.shockImpactCents,fundingCents:h.fundingCents}))};const url=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='risklab-estudo-editorial.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);ui('report-status').textContent='Memória exportada com premissas e movimentos diários.';};
 render(true);document.documentElement.classList.add('js-ready');
 startEditorialMotion();

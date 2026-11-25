@@ -4,7 +4,7 @@ import {slice,selectRows,suppliers,orders,cutoff,costBridge} from './data.mjs';
 import {Quant} from './Quant';
 import {Pipeline} from './Pipeline';
 import {GlobalExposure} from './GlobalExposure';
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Activity,
   BarChart2,
@@ -137,6 +137,8 @@ interface MonthlySlice {
 }
 
 export default function App() {
+  const [mobileModulesOpen, setMobileModulesOpen] = useState(false);
+  const mobileModulesButton = useRef<HTMLButtonElement>(null);
   const [activeTab, setActiveTab] = useState<
     'global' | 'overview' | 'basel_backtest' | 'ndf_carry_garch' | 'suppliers_orders' | 'sql_java_parity'
   >('overview');
@@ -277,7 +279,8 @@ export default function App() {
           RiskLab<span aria-hidden="true">.</span><small style={{fontFamily:'monospace',fontSize:9,letterSpacing:'1.7px',marginLeft:12}}>TRADE RESEARCH</small>
         </a>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <a href="/editorial.html" className="terminal-study-link">Estudo cambial ↗</a>
           <button
             onClick={() => setIsCommandOpen(true)}
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-[#161A22] hover:bg-[#1E232D] border border-[#262B36] text-[#A0A8B6] text-[11px] font-mono cursor-pointer"
@@ -306,7 +309,11 @@ export default function App() {
       {/* Main Frame */}
       <div className="flex-1 flex flex-col lg:flex-row">
         {/* Sidebar Fixa no Estilo Sóbrio (#12151B / #161A22) */}
-        <aside className="w-full lg:w-64 bg-[#12151B] border-b lg:border-b-0 lg:border-r border-[#262B36] p-4 flex flex-col justify-between shrink-0">
+        <button type="button" ref={mobileModulesButton} className="terminal-modules-toggle lg:hidden" aria-expanded={mobileModulesOpen} aria-controls="terminal-modules" onClick={() => setMobileModulesOpen(open => !open)}>
+          {mobileModulesOpen ? 'Recolher módulos e simulação' : 'Módulos e simulação'}
+          <span aria-hidden="true">{mobileModulesOpen ? '−' : '+'}</span>
+        </button>
+        <aside id="terminal-modules" className={`w-full lg:w-64 bg-[#12151B] border-b lg:border-b-0 lg:border-r border-[#262B36] p-4 lg:flex flex-col justify-between shrink-0 ${mobileModulesOpen ? 'flex' : 'hidden'}`}>
           <div className="space-y-6">
             <div>
               <div className="text-[10px] font-mono uppercase tracking-[0.14em] text-[#8B949E] px-2 mb-2">
@@ -325,8 +332,13 @@ export default function App() {
                   return (
                     <button
                       key={tab.id}
+                      aria-current={active ? "page" : undefined}
                       onClick={() => {
                         setActiveTab(tab.id as any);
+                        if (mobileModulesOpen && mobileModulesButton.current?.getClientRects().length) {
+                          mobileModulesButton.current.focus();
+                        }
+                        setMobileModulesOpen(false);
                         setPulseTrigger((p) => p + 1);
                       }}
                       className={`w-full text-left px-3 py-2.5 rounded-[6px] transition cursor-pointer border ${
@@ -356,6 +368,7 @@ export default function App() {
                 </div>
                 <input
                   type="range"
+                  aria-label="Neutralização FX hipotética"
                   min={0}
                   max={100}
                   step={10}

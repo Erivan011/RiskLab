@@ -147,3 +147,7 @@ As séries externas do TradingView permanecem incorporadas no editorial, com dis
 - [Licença MIT do código](LICENSE)
 
 Projeto de portfólio de **Erivan Santos**.
+
+## Agentes de manutenção
+
+[Execução, histórico e diagnóstico local](docs/agentes/EXECUCAO.md).

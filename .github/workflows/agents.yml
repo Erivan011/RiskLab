@@ -1,0 +1,68 @@
+name: Agentes de manutenção
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - scripts/agent_cycle.py
+      - scripts/agent-checks.json
+      - scripts/test_agent_cycle.py
+      - scripts/visual_agent.py
+      - frontend/src/**
+      - design/editorial.html
+      - web/editorial*
+      - .github/workflows/agents.yml
+  schedule:
+    - cron: '37 12 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agents-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verificacoes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: python -m pip install playwright==1.62.0
+      - run: python -m playwright install --with-deps chromium
+      - uses: actions/cache/restore@v4
+        with:
+          path: |
+            .agent-state/history.json
+            .agent-state/visual/observations.json
+          key: agents-v1-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            agents-v1-${{ github.ref_name }}-
+      - run: python scripts/test_agent_cycle.py
+      - run: python scripts/agent_cycle.py
+      - uses: actions/cache/save@v4
+        if: always() && hashFiles('.agent-state/history.json') != ''
+        with:
+          path: |
+            .agent-state/history.json
+            .agent-state/visual/observations.json
+          key: agents-v1-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+      - uses: actions/upload-artifact@v4
+        if: always() && hashFiles('.agent-state/history.json') != ''
+        with:
+          name: agent-history
+          path: |
+            .agent-state/history.json
+            .agent-state/visual/
+          include-hidden-files: true
+          retention-days: 30

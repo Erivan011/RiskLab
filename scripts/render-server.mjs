@@ -41,5 +41,5 @@ const server = http.createServer(async (req, res) => {
     res.end();
   }
 });
-server.listen(Number(process.env.PORT || 3000), '0.0.0.0');
+server.listen(Number(process.env.PORT || 3000), process.env.HOST || '0.0.0.0');
 process.on('SIGTERM', () => server.close(() => process.exit(0)));

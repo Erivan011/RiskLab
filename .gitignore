@@ -16,3 +16,6 @@ web/terminal-react.*
 web/terminal.html
 web/react-build/
 node_modules
+
+# Histórico local dos agentes
+.agent-state/
